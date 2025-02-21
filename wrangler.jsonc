@@ -1,0 +1,23 @@
+{
+  "name": "my-worker",
+  "main": "src/server.ts",
+  "compatibility_date": "2025-02-04",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "public"
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "MyAgent",
+        "class_name": "MyAgent"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["MyAgent"]
+    }
+  ]
+}
