@@ -30,7 +30,7 @@
   "dependencies": {
     "@ai-sdk/openai": "^1.1.13",
     "@ai-sdk/react": "^1.1.17",
-    "@cloudflare/agents": "^0.0.9",
+    "@cloudflare/agents": "^0.0.10",
     "ai": "^4.1.45",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
