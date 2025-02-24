@@ -63,6 +63,22 @@ body {
   -moz-osx-font-smoothing: grayscale;
   font-weight: 450;
   letter-spacing: -0.01em;
+  background-image: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.025) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+[data-theme="light"] body {
+  background-image: linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.025) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.025) 1px, transparent 1px);
 }
 
 /* Controls container */
@@ -346,30 +362,49 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 1;
 }
 
 .app-header {
-  padding: 1rem;
-  border-bottom: 1px solid var(--border);
+  padding: 1.5rem;
+  background: var(--background);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
+}
+
+.app-header::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--border) 20%,
+    var(--border) 80%,
+    transparent
+  );
 }
 
 .header-content h1 {
   margin: 0;
-  font-size: 2rem;
-  color: var(--cf-orange);
-  font-weight: 800;
+  font-size: 1.75rem;
+  color: var(--text);
+  font-weight: 700;
   letter-spacing: -0.02em;
 }
 
 .header-content .subtitle {
   margin: 0.25rem 0 0;
-  font-size: 1rem;
+  font-size: 0.875rem;
   color: var(--text);
-  opacity: 0.9;
-  font-weight: 500;
+  opacity: 0.6;
+  font-weight: 450;
 }
 
 .welcome-message {
