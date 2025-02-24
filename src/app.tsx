@@ -63,26 +63,49 @@ export default function Chat() {
   );
 
   return (
-    <>
-      <div className="controls-container">
-        <button
-          onClick={toggleTheme}
-          className="theme-switch"
-          data-theme={theme}
-          aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-        >
-          <div className="theme-switch-handle" />
-        </button>
-        <button onClick={clearHistory} className="clear-history">
-          🗑️ Clear History
-        </button>
-      </div>
+    <div className="app-container">
+      <header className="app-header">
+        <div className="header-content">
+          <h1>AI Chat Assistant</h1>
+          <p className="subtitle">Powered by Cloudflare Agents</p>
+        </div>
+        <div className="controls-container">
+          <button
+            onClick={toggleTheme}
+            className="theme-switch"
+            data-theme={theme}
+            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+          >
+            <div className="theme-switch-handle" />
+          </button>
+          <button onClick={clearHistory} className="clear-history">
+            🗑️ Clear History
+          </button>
+        </div>
+      </header>
 
       <div className="chat-container">
         <div className="messages-wrapper">
+          {messages.length === 0 && (
+            <div className="welcome-message">
+              <h2>👋 Welcome!</h2>
+              <p>
+                Start a conversation with your AI assistant. Try asking about:
+              </p>
+              <ul>
+                <li>🌤️ Weather information for any city</li>
+                <li>🕒 Local time in different locations</li>
+              </ul>
+            </div>
+          )}
           {messages?.map((m: Message) => (
-            <div key={m.id} className="message">
-              <strong>{`${m.role}: `}</strong>
+            <div key={m.id} className={`message ${m.role}-message`}>
+              <div className="message-header">
+                <span className="message-role">{m.role}</span>
+                <span className="message-time">
+                  {new Date().toLocaleTimeString()}
+                </span>
+              </div>
               {m.parts?.map((part, i) => {
                 switch (part.type) {
                   case "text":
@@ -95,7 +118,6 @@ export default function Chat() {
                     const toolInvocation = part.toolInvocation;
                     const toolCallId = toolInvocation.toolCallId;
 
-                    // render confirmation tool (client-side tool with user interaction)
                     if (
                       toolsRequiringConfirmation.includes(
                         toolInvocation.toolName
@@ -104,14 +126,18 @@ export default function Chat() {
                     ) {
                       return (
                         <div key={toolCallId} className="tool-invocation">
-                          Run{" "}
-                          <span className="dynamic-info">
-                            {toolInvocation.toolName}
-                          </span>{" "}
-                          with args:{" "}
-                          <span className="dynamic-info">
-                            {JSON.stringify(toolInvocation.args)}
-                          </span>
+                          <div className="tool-header">
+                            <span className="tool-icon">🛠️</span>
+                            <span className="tool-name">
+                              {toolInvocation.toolName}
+                            </span>
+                          </div>
+                          <div className="tool-args">
+                            Arguments:{" "}
+                            <code>
+                              {JSON.stringify(toolInvocation.args, null, 2)}
+                            </code>
+                          </div>
                           <div className="button-container">
                             <button
                               className="button-approve"
@@ -122,7 +148,7 @@ export default function Chat() {
                                 })
                               }
                             >
-                              Yes
+                              ✓ Approve
                             </button>
                             <button
                               className="button-reject"
@@ -133,7 +159,7 @@ export default function Chat() {
                                 })
                               }
                             >
-                              No
+                              ✕ Reject
                             </button>
                           </div>
                         </div>
@@ -141,22 +167,32 @@ export default function Chat() {
                     }
                 }
               })}
-              <br />
             </div>
           ))}
           <div ref={messagesEndRef} />
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="input-form">
           <input
             disabled={pendingToolCallConfirmation}
             className="chat-input"
             value={input}
-            placeholder="Say something..."
+            placeholder={
+              pendingToolCallConfirmation
+                ? "Please respond to the tool confirmation above..."
+                : "Type your message here..."
+            }
             onChange={handleInputChange}
           />
+          <button
+            type="submit"
+            className="send-button"
+            disabled={pendingToolCallConfirmation || !input.trim()}
+          >
+            Send
+          </button>
         </form>
       </div>
-    </>
+    </div>
   );
 }
