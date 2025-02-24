@@ -1,18 +1,19 @@
-import { createOpenAI } from "@ai-sdk/openai";
-import {
-  createDataStreamResponse,
-  type Message,
-  streamText,
-  type StreamTextOnFinishCallback,
-} from "ai";
-import { processToolCalls } from "./utils";
-import { tools, executions } from "./tools";
 import {
   type AgentNamespace,
   type Connection,
   routeAgentRequest,
 } from "@cloudflare/agents";
 import { AIChatAgent } from "@cloudflare/agents/ai-chat-agent";
+import {
+  createDataStreamResponse,
+  type Message,
+  streamText,
+  type StreamTextOnFinishCallback,
+} from "ai";
+
+import { createOpenAI } from "@ai-sdk/openai";
+import { processToolCalls } from "./utils";
+import { tools, executions } from "./tools";
 
 // Environment variables type definition
 type Env = {

@@ -8,12 +8,7 @@ import {
   type ToolSet,
 } from "ai";
 import { z } from "zod";
-
-// Approval string to be shared across frontend and backend
-export const APPROVAL = {
-  YES: "Yes, confirmed.",
-  NO: "No, denied.",
-} as const;
+import { APPROVAL } from "./shared";
 
 function isValidToolName<K extends PropertyKey, T extends object>(
   key: K,
@@ -120,14 +115,14 @@ export async function processToolCalls<
   return [...messages.slice(0, -1), { ...lastMessage, parts: processedParts }];
 }
 
-export function getToolsRequiringConfirmation<
-  T extends ToolSet
-  // E extends {
-  //   [K in keyof T as T[K] extends { execute: Function } ? never : K]: T[K];
-  // },
->(tools: T): string[] {
-  return (Object.keys(tools) as (keyof T)[]).filter((key) => {
-    const maybeTool = tools[key];
-    return typeof maybeTool.execute !== "function";
-  }) as string[];
-}
+// export function getToolsRequiringConfirmation<
+//   T extends ToolSet
+//   // E extends {
+//   //   [K in keyof T as T[K] extends { execute: Function } ? never : K]: T[K];
+//   // },
+// >(tools: T): string[] {
+//   return (Object.keys(tools) as (keyof T)[]).filter((key) => {
+//     const maybeTool = tools[key];
+//     return typeof maybeTool.execute !== "function";
+//   }) as string[];
+// }
