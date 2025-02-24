@@ -30,18 +30,14 @@ export class Chat extends AIChatAgent<Env> {
    * @param messages - Array of chat messages in the conversation
    * @param onFinish - Callback function executed when streaming completes
    */
-  async onChatMessage(
-    connection: Connection,
-    messages: Message[],
-    onFinish: StreamTextOnFinishCallback<any>
-  ) {
+  async onChatMessage(onFinish: StreamTextOnFinishCallback<any>) {
     // Create a streaming response that handles both text and tool outputs
     const dataStreamResponse = createDataStreamResponse({
       execute: async (dataStream) => {
         // Process any pending tool calls from previous messages
         // This handles human-in-the-loop confirmations for tools
         const processedMessages = await processToolCalls({
-          messages,
+          messages: this.messages,
           dataStream,
           tools,
           executions,
