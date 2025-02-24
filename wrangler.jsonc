@@ -1,5 +1,5 @@
 {
-  "name": "my-worker",
+  "name": "my-chat-agent",
   "main": "src/server.ts",
   "compatibility_date": "2025-02-04",
   "compatibility_flags": ["nodejs_compat"],
@@ -9,15 +9,15 @@
   "durable_objects": {
     "bindings": [
       {
-        "name": "MyAgent",
-        "class_name": "MyAgent"
+        "name": "Chat",
+        "class_name": "Chat"
       }
     ]
   },
   "migrations": [
     {
       "tag": "v1",
-      "new_sqlite_classes": ["MyAgent"]
+      "new_sqlite_classes": ["Chat"]
     }
   ]
 }

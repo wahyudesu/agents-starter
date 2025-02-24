@@ -1,23 +1,28 @@
-# 🧠 Cloudflare AI Agents Starter
+# 🤖 Chat Agent Starter Kit
 
-A starter template for building AI-powered agents using Cloudflare's Agent platform. This project demonstrates how to create an interactive AI agent that can maintain state and process requests using Cloudflare's distributed infrastructure.
+![agents-header](https://github.com/user-attachments/assets/f6d99eeb-1803-4495-9c5e-3cf07a37b402)
+
+A starter template for building AI-powered chat agents using Cloudflare's Agent platform. This project provides a foundation for creating interactive chat experiences with AI, complete with a modern UI and tool integration capabilities.
+
+Built with [`@cloudflare/agents`](https://developers.cloudflare.com/agents/) for serverless, stateful execution that scales automatically on Cloudflare's global network, and [`ai`](https://www.npmjs.com/package/ai) for powerful AI interactions and streaming capabilities.
 
 ## Features
 
-- 🤖 Stateful AI agent communication
-- ⚡️ Powered by Cloudflare Agents for serverless execution
-- 🧠 Integration with OpenAI's GPT models
-- ⚛️ React-based frontend with ready-to-use agent hooks
-- 🔄 Seamless client-agent interaction
+- 💬 Interactive chat interface with AI
+- 🛠️ Built-in tool system with human-in-the-loop confirmation
+- 🌓 Dark/Light theme support
+- ⚡️ Real-time streaming responses
+- 🔄 State management and chat history
+- 🎨 Modern, responsive UI
 
 ## Prerequisites
 
 - Cloudflare account
-- (optional) OpenAI API key
+- OpenAI API key
 
-## Getting Started
+## Quick Start
 
-1. Create a new Cloudflare project with this template:
+1. Create a new project:
 
 ```bash
 npm create cloudflare@latest -- --template threepointone/agents-starter
@@ -29,21 +34,21 @@ npm create cloudflare@latest -- --template threepointone/agents-starter
 npm install
 ```
 
-3. Configure environment variables:
+3. Set up your environment:
 
-Create a `.dev.vars` file in your project root (based on `.dev.vars.example`). In this example, we're using an OpenAI API key.
+Create a `.dev.vars` file:
 
 ```env
 OPENAI_API_KEY=your_openai_api_key
 ```
 
-4. Start the development server:
+4. Run locally:
 
 ```bash
 npm start
 ```
 
-5. Deploy to Cloudflare:
+5. Deploy:
 
 ```bash
 npm run deploy
@@ -53,55 +58,116 @@ npm run deploy
 
 ```
 ├── src/
-│   ├── styles.css     # CSS
-│   ├── app.tsx        # Main React application
-│   ├── client.tsx     # Client-side entry point
-│   └── server.ts      # Agent implementation and server logic
-├── .dev.vars          # Development environment variables
-└── wrangler.jsonc     # Cloudflare Workers configuration
+│   ├── app.tsx        # Chat UI implementation
+│   ├── server.ts      # Chat agent logic
+│   ├── tools.ts       # Tool definitions
+│   ├── utils.ts       # Helper functions
+│   └── styles.css     # UI styling
 ```
 
-## How It Works
+## Customization Guide
 
-### Agent Implementation (server.ts)
+### Adding New Tools
 
-The project uses Cloudflare's Agent platform to create a stateful AI agent that can:
+Add new tools in `tools.ts` using the tool builder:
 
-- Process incoming requests
-- Generate responses using OpenAI's models
-- Maintain state between requests
-- Handle multiple concurrent interactions
+```typescript
+// Example of a tool that requires confirmation
+const searchDatabase = tool({
+  description: "Search the database for user records",
+  parameters: z.object({
+    query: z.string(),
+    limit: z.number().optional(),
+  }),
+  // No execute function = requires confirmation
+});
 
-### Frontend (app.tsx)
-
-The React frontend utilizes the `@cloudflare/agents/react` package to:
-
-- Connect to your agent instance
-- Send requests to the agent
-- Handle responses
-- Manage application state
-
-## Deployment
-
-To deploy your agent to Cloudflare:
-
-1. Ensure you're logged in to Cloudflare:
-
-```bash
-npx wrangler login
+// Example of an auto-executing tool
+const getCurrentTime = tool({
+  description: "Get current server time",
+  parameters: z.object({}),
+  execute: async () => new Date().toISOString(),
+});
 ```
 
-2. Deploy your agent:
+To handle tool confirmations, add execution functions to the `executions` object:
 
-```bash
-npm run deploy
+```typescript
+export const executions = {
+  searchDatabase: async ({
+    query,
+    limit,
+  }: {
+    query: string;
+    limit?: number;
+  }) => {
+    // Implementation for when the tool is confirmed
+    const results = await db.search(query, limit);
+    return results;
+  },
+  // Add more execution handlers for other tools that require confirmation
+};
 ```
+
+Tools can be configured in two ways:
+
+1. With an `execute` function for automatic execution
+2. Without an `execute` function, requiring confirmation and using the `executions` object to handle the confirmed action
+
+### Modifying the UI
+
+The chat interface is built with React and can be customized in `app.tsx`:
+
+- Modify the theme colors in `styles.css`
+- Add new UI components in the chat container
+- Customize message rendering and tool confirmation dialogs
+- Add new controls to the header
+
+### Example Use Cases
+
+1. **Customer Support Agent**
+
+   - Add tools for:
+     - Ticket creation/lookup
+     - Order status checking
+     - Product recommendations
+     - FAQ database search
+
+2. **Development Assistant**
+
+   - Integrate tools for:
+     - Code linting
+     - Git operations
+     - Documentation search
+     - Dependency checking
+
+3. **Data Analysis Assistant**
+
+   - Build tools for:
+     - Database querying
+     - Data visualization
+     - Statistical analysis
+     - Report generation
+
+4. **Personal Productivity Assistant**
+   - Implement tools for:
+     - Calendar management
+     - Task tracking
+     - Email drafting
+     - Note taking
+
+Each use case can be implemented by:
+
+1. Adding relevant tools in `tools.ts`
+2. Customizing the UI for specific interactions
+3. Extending the agent's capabilities in `server.ts`
+4. Adding any necessary external API integrations
 
 ## Learn More
 
+- [`@cloudflare/agents`](https://github.com/cloudflare/agents/blob/main/packages/agents/README.md)
 - [Cloudflare Agents Documentation](https://developers.cloudflare.com/agents/)
 - [Cloudflare Workers Documentation](https://developers.cloudflare.com/workers/)
-- [What are Durable Objects?](https://developers.cloudflare.com/durable-objects/what-are-durable-objects/)
 
 ## License
 

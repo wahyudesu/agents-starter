@@ -1,57 +1,81 @@
 import { createOpenAI } from "@ai-sdk/openai";
 import {
-  Agent,
-  routeAgentRequest,
+  createDataStreamResponse,
+  type Message,
+  streamText,
+  type StreamTextOnFinishCallback,
+} from "ai";
+import { processToolCalls } from "./utils";
+import { tools, executions } from "./tools";
+import {
+  type AgentNamespace,
   type Connection,
-  type ConnectionContext,
+  routeAgentRequest,
 } from "@cloudflare/agents";
-import { generateText } from "ai";
-import type { WSMessage } from "partyserver";
+import { AIChatAgent } from "@cloudflare/agents/ai-chat-agent";
 
+// Environment variables type definition
 type Env = {
   OPENAI_API_KEY: string;
-  MyAgent: DurableObjectNamespace<MyAgent>;
+  Chat: AgentNamespace<Chat>;
 };
 
-export class MyAgent extends Agent<Env> {
-  openai = createOpenAI({
-    apiKey: this.env.OPENAI_API_KEY,
-  });
-
-  constructor(state: DurableObjectState, env: Env) {
-    super(state, env);
-  }
-
-  onConnect(
+/**
+ * Chat Agent implementation that handles real-time AI chat interactions
+ */
+export class Chat extends AIChatAgent<Env> {
+  /**
+   * Handles incoming chat messages and manages the response stream
+   * @param connection - WebSocket connection instance
+   * @param messages - Array of chat messages in the conversation
+   * @param onFinish - Callback function executed when streaming completes
+   */
+  async onChatMessage(
     connection: Connection,
-    ctx: ConnectionContext
-  ): void | Promise<void> {
-    console.log("Connected to agent");
-    connection.send("Hello! I'm your AI assistant. How can I help you today?");
-  }
+    messages: Message[],
+    onFinish: StreamTextOnFinishCallback<any>
+  ) {
+    // Create a streaming response that handles both text and tool outputs
+    const dataStreamResponse = createDataStreamResponse({
+      execute: async (dataStream) => {
+        // Process any pending tool calls from previous messages
+        // This handles human-in-the-loop confirmations for tools
+        const processedMessages = await processToolCalls({
+          messages,
+          dataStream,
+          tools,
+          executions,
+        });
 
-  async onMessage(connection: Connection, message: WSMessage): Promise<void> {
-    try {
-      console.log("Message from client", message);
-      const response = await generateText({
-        model: this.openai("gpt-4"),
-        prompt: message as string,
-        maxTokens: 500,
-      });
+        // Initialize OpenAI client with API key from environment
+        const openai = createOpenAI({
+          apiKey: this.env.OPENAI_API_KEY,
+        });
 
-      connection.send(response.text);
-    } catch (error) {
-      console.error("Error processing message:", error);
-      connection.send(
-        "I apologize, but I encountered an error processing your message. Please try again."
-      );
-    }
+        // Stream the AI response using GPT-4
+        const result = streamText({
+          model: openai("gpt-4o"),
+          messages: processedMessages,
+          tools,
+          onFinish,
+        });
+
+        // Merge the AI response stream with tool execution outputs
+        result.mergeIntoDataStream(dataStream);
+      },
+    });
+
+    return dataStreamResponse;
   }
 }
 
+/**
+ * Worker entry point that routes incoming requests to the appropriate handler
+ */
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
     return (
+      // Route the request to our agent or return 404 if not found
       (await routeAgentRequest(request, env)) ||
       new Response("Not found", { status: 404 })
     );

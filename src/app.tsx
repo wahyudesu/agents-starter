@@ -1,69 +1,162 @@
+import { type Message } from "@ai-sdk/react";
+import { APPROVAL, getToolsRequiringConfirmation } from "./utils";
+import { tools } from "./tools";
+import "./styles.css";
+import { useEffect, useState, useRef } from "react";
 import { useAgent } from "@cloudflare/agents/react";
-import { useState } from "react";
+import { useAgentChat } from "@cloudflare/agents/ai-react";
 
-interface Message {
-  text: string;
-  isUser: boolean;
-}
+export default function Chat() {
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-export default function App() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-
-  const agent = useAgent({
-    agent: "my-agent",
-    onMessage: (message) => {
-      setMessages((prev) => [
-        ...prev,
-        { text: message.data as string, isUser: false },
-      ]);
-      setIsLoading(false);
-    },
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
-
-    const userMessage = input.trim();
-    setMessages((prev) => [...prev, { text: userMessage, isUser: true }]);
-    setInput("");
-    setIsLoading(true);
-    agent.send(userMessage);
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  useEffect(() => {
+    // Set initial theme
+    document.documentElement.setAttribute("data-theme", theme);
+  }, []);
+
+  // Scroll to bottom on mount
+  useEffect(() => {
+    scrollToBottom();
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+    document.documentElement.setAttribute("data-theme", newTheme);
+  };
+
+  const agent = useAgent({
+    agent: "chat",
+  });
+
+  const {
+    messages,
+    input,
+    handleInputChange,
+    handleSubmit,
+    addToolResult,
+    clearHistory,
+  } = useAgentChat({
+    agent,
+    maxSteps: 5,
+  });
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const toolsRequiringConfirmation = getToolsRequiringConfirmation(tools);
+
+  const pendingToolCallConfirmation = messages.some((m: Message) =>
+    m.parts?.some(
+      (part) =>
+        part.type === "tool-invocation" &&
+        part.toolInvocation.state === "call" &&
+        toolsRequiringConfirmation.includes(part.toolInvocation.toolName)
+    )
+  );
+
   return (
-    <div className="min-h-screen">
-      <div className="chat-container">
-        {messages.map((message, index) => (
-          <div
-            key={index}
-            className={`message ${
-              message.isUser ? "user-message" : "agent-message"
-            }`}
-          >
-            {message.text}
-          </div>
-        ))}
-        {isLoading && <div className="message agent-message">Thinking...</div>}
+    <>
+      <div className="controls-container">
+        <button
+          onClick={toggleTheme}
+          className="theme-switch"
+          data-theme={theme}
+          aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+        >
+          <div className="theme-switch-handle" />
+        </button>
+        <button onClick={clearHistory} className="clear-history">
+          🗑️ Clear History
+        </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="input-container">
-        <div className="input-wrapper">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your message..."
-            className="chat-input"
-            disabled={isLoading}
-          />
-          <button type="submit" className="send-button" disabled={isLoading}>
-            Send
-          </button>
+      <div className="chat-container">
+        <div className="messages-wrapper">
+          {messages?.map((m: Message) => (
+            <div key={m.id} className="message">
+              <strong>{`${m.role}: `}</strong>
+              {m.parts?.map((part, i) => {
+                switch (part.type) {
+                  case "text":
+                    return (
+                      <div key={i} className="message-content">
+                        {part.text}
+                      </div>
+                    );
+                  case "tool-invocation":
+                    const toolInvocation = part.toolInvocation;
+                    const toolCallId = toolInvocation.toolCallId;
+
+                    // render confirmation tool (client-side tool with user interaction)
+                    if (
+                      toolsRequiringConfirmation.includes(
+                        toolInvocation.toolName
+                      ) &&
+                      toolInvocation.state === "call"
+                    ) {
+                      return (
+                        <div key={toolCallId} className="tool-invocation">
+                          Run{" "}
+                          <span className="dynamic-info">
+                            {toolInvocation.toolName}
+                          </span>{" "}
+                          with args:{" "}
+                          <span className="dynamic-info">
+                            {JSON.stringify(toolInvocation.args)}
+                          </span>
+                          <div className="button-container">
+                            <button
+                              className="button-approve"
+                              onClick={() =>
+                                addToolResult({
+                                  toolCallId,
+                                  result: APPROVAL.YES,
+                                })
+                              }
+                            >
+                              Yes
+                            </button>
+                            <button
+                              className="button-reject"
+                              onClick={() =>
+                                addToolResult({
+                                  toolCallId,
+                                  result: APPROVAL.NO,
+                                })
+                              }
+                            >
+                              No
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    }
+                }
+              })}
+              <br />
+            </div>
+          ))}
+          <div ref={messagesEndRef} />
         </div>
-      </form>
-    </div>
+
+        <form onSubmit={handleSubmit}>
+          <input
+            disabled={pendingToolCallConfirmation}
+            className="chat-input"
+            value={input}
+            placeholder="Say something..."
+            onChange={handleInputChange}
+          />
+        </form>
+      </div>
+    </>
   );
 }
