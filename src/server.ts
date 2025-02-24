@@ -10,7 +10,6 @@ import {
   streamText,
   type StreamTextOnFinishCallback,
 } from "ai";
-
 import { createOpenAI } from "@ai-sdk/openai";
 import { processToolCalls } from "./utils";
 import { tools, executions } from "./tools";
