@@ -230,6 +230,12 @@ body {
   font-weight: 450;
 }
 
+.message-content.scheduled-message {
+  color: var(--cf-orange);
+  font-weight: 600;
+  font-family: var(--font-sans);
+}
+
 /* Tool invocation styles */
 .tool-invocation {
   margin-top: 1rem;

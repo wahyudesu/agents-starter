@@ -79,7 +79,7 @@ export class Chat extends AIChatAgent<Env> {
       {
         id: generateId(),
         role: "user",
-        content: description,
+        content: `scheduled message: ${description}`,
       },
     ]);
   }

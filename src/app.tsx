@@ -114,8 +114,15 @@ export default function Chat() {
                 switch (part.type) {
                   case "text":
                     return (
-                      <div key={i} className="message-content">
-                        {part.text}
+                      <div
+                        key={i}
+                        className={`message-content ${
+                          part.text.startsWith("scheduled message")
+                            ? "scheduled-message"
+                            : ""
+                        }`}
+                      >
+                        {part.text.replace(/^scheduled message: /, "")}
                       </div>
                     );
                   case "tool-invocation":

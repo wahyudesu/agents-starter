@@ -8,6 +8,7 @@ A starter template for building AI-powered chat agents using Cloudflare's Agent 
 
 - 💬 Interactive chat interface with AI
 - 🛠️ Built-in tool system with human-in-the-loop confirmation
+- 📅 Advanced task scheduling (one-time, delayed, and recurring via cron)
 - 🌓 Dark/Light theme support
 - ⚡️ Real-time streaming responses
 - 🔄 State management and chat history
@@ -86,6 +87,20 @@ const getCurrentTime = tool({
   parameters: z.object({}),
   execute: async () => new Date().toISOString(),
 });
+
+// Scheduling tool implementation
+const scheduleTask = tool({
+  description:
+    "schedule a task to be executed at a later time. 'when' can be a date, a delay in seconds, or a cron pattern.",
+  parameters: z.object({
+    type: z.enum(["scheduled", "delayed", "cron"]),
+    when: z.union([z.number(), z.string()]),
+    payload: z.string(),
+  }),
+  execute: async ({ type, when, payload }) => {
+    // ... see the implementation in tools.ts
+  },
+});
 ```
 
 To handle tool confirmations, add execution functions to the `executions` object:
@@ -148,11 +163,21 @@ The chat interface is built with React and can be customized in `app.tsx`:
      - Report generation
 
 4. **Personal Productivity Assistant**
+
    - Implement tools for:
-     - Calendar management
-     - Task tracking
+     - Task scheduling with flexible timing options
+     - One-time, delayed, and recurring task management
+     - Task tracking with reminders
      - Email drafting
      - Note taking
+
+5. **Scheduling Assistant**
+   - Build tools for:
+     - One-time event scheduling using specific dates
+     - Delayed task execution (e.g., "remind me in 30 minutes")
+     - Recurring tasks using cron patterns
+     - Task payload management
+     - Flexible scheduling patterns
 
 Each use case can be implemented by:
 
