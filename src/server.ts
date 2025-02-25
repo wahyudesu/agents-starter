@@ -19,7 +19,7 @@ import { tools, executions } from "./tools";
 import { AsyncLocalStorage } from "node:async_hooks";
 
 // Environment variables type definition
-type Env = {
+export type Env = {
   OPENAI_API_KEY: string;
   Chat: AgentNamespace<Chat>;
 };
