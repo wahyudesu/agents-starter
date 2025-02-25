@@ -82,7 +82,6 @@ export class Chat extends AIChatAgent<Env> {
         content: description,
       },
     ]);
-    return `Task executed: ${description}`;
   }
 }
 
