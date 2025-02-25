@@ -53,6 +53,12 @@ export class Chat extends AIChatAgent<Env> {
             apiKey: this.env.OPENAI_API_KEY,
           });
 
+          // Cloudflare AI Gateway
+          // const openai = createOpenAI({
+          //   apiKey: this.env.OPENAI_API_KEY,
+          //   baseURL: this.env.GATEWAY_BASE_URL,
+          // });
+
           // Stream the AI response using GPT-4
           const result = streamText({
             model: openai("gpt-4o-2024-11-20"),
