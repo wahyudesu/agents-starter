@@ -2,9 +2,7 @@
 
 ![agents-header](https://github.com/user-attachments/assets/f6d99eeb-1803-4495-9c5e-3cf07a37b402)
 
-A starter template for building AI-powered chat agents using Cloudflare's Agent platform. This project provides a foundation for creating interactive chat experiences with AI, complete with a modern UI and tool integration capabilities.
-
-Built with [`agents-sdk`](https://developers.cloudflare.com/agents/) for serverless, stateful execution that scales automatically on Cloudflare's global network, and [`ai`](https://www.npmjs.com/package/ai) for powerful AI interactions and streaming capabilities.
+A starter template for building AI-powered chat agents using Cloudflare's Agent platform, powered by [`agents-sdk`](https://www.npmjs.com/package/agents-sdk). This project provides a foundation for creating interactive chat experiences with AI, complete with a modern UI and tool integration capabilities.
 
 ## Features
 
