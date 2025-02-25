@@ -5,6 +5,8 @@
 import { tool } from "ai";
 import { z } from "zod";
 
+import { agentContext } from "./server";
+
 /**
  * Weather information tool that requires human confirmation
  * When invoked, this will present a confirmation dialog to the user
@@ -30,6 +32,37 @@ const getLocalTime = tool({
   },
 });
 
+const scheduleTask = tool({
+  description:
+    "schedule a task to be executed at a later time. 'when' can be a date, a delay in seconds, or a cron pattern.",
+  parameters: z.object({
+    type: z.enum(["scheduled", "delayed", "cron"]),
+    when: z.union([z.number(), z.string()]),
+    payload: z.string(),
+  }),
+  execute: async ({ type, when, payload }) => {
+    // we can now read the agent context from the ALS store
+    const agent = agentContext.getStore();
+    if (!agent) {
+      throw new Error("No agent found");
+    }
+    try {
+      agent.schedule(
+        type === "scheduled"
+          ? new Date(when) // scheduled
+          : type === "delayed"
+          ? when // delayed
+          : when, // cron
+        "executeTask",
+        payload
+      );
+    } catch (error) {
+      console.error("error scheduling task", error);
+      return `Error scheduling task: ${error}`;
+    }
+    return `Task scheduled for ${when}`;
+  },
+});
 /**
  * Export all available tools
  * These will be provided to the AI model to describe available capabilities
@@ -37,6 +70,7 @@ const getLocalTime = tool({
 export const tools = {
   getWeatherInformation,
   getLocalTime,
+  scheduleTask,
 };
 
 /**

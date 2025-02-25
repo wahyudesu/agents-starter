@@ -2,10 +2,13 @@ import {
   type AgentNamespace,
   type Connection,
   routeAgentRequest,
-} from "@cloudflare/agents";
-import { AIChatAgent } from "@cloudflare/agents/ai-chat-agent";
+  type Agent,
+  type Schedule,
+} from "agents-sdk";
+import { AIChatAgent } from "agents-sdk/ai-chat-agent";
 import {
   createDataStreamResponse,
+  generateId,
   type Message,
   streamText,
   type StreamTextOnFinishCallback,
@@ -13,6 +16,7 @@ import {
 import { createOpenAI } from "@ai-sdk/openai";
 import { processToolCalls } from "./utils";
 import { tools, executions } from "./tools";
+import { AsyncLocalStorage } from "node:async_hooks";
 
 // Environment variables type definition
 type Env = {
@@ -20,48 +24,65 @@ type Env = {
   Chat: AgentNamespace<Chat>;
 };
 
+// we use ALS to expose the agent context to the tools
+export const agentContext = new AsyncLocalStorage<Chat>();
 /**
  * Chat Agent implementation that handles real-time AI chat interactions
  */
 export class Chat extends AIChatAgent<Env> {
   /**
    * Handles incoming chat messages and manages the response stream
-   * @param connection - WebSocket connection instance
-   * @param messages - Array of chat messages in the conversation
    * @param onFinish - Callback function executed when streaming completes
    */
   async onChatMessage(onFinish: StreamTextOnFinishCallback<any>) {
     // Create a streaming response that handles both text and tool outputs
-    const dataStreamResponse = createDataStreamResponse({
-      execute: async (dataStream) => {
-        // Process any pending tool calls from previous messages
-        // This handles human-in-the-loop confirmations for tools
-        const processedMessages = await processToolCalls({
-          messages: this.messages,
-          dataStream,
-          tools,
-          executions,
-        });
+    return agentContext.run(this, async () => {
+      const dataStreamResponse = createDataStreamResponse({
+        execute: async (dataStream) => {
+          // Process any pending tool calls from previous messages
+          // This handles human-in-the-loop confirmations for tools
+          const processedMessages = await processToolCalls({
+            messages: this.messages,
+            dataStream,
+            tools,
+            executions,
+          });
 
-        // Initialize OpenAI client with API key from environment
-        const openai = createOpenAI({
-          apiKey: this.env.OPENAI_API_KEY,
-        });
+          // Initialize OpenAI client with API key from environment
+          const openai = createOpenAI({
+            apiKey: this.env.OPENAI_API_KEY,
+          });
 
-        // Stream the AI response using GPT-4
-        const result = streamText({
-          model: openai("gpt-4o"),
-          messages: processedMessages,
-          tools,
-          onFinish,
-        });
+          // Stream the AI response using GPT-4
+          const result = streamText({
+            model: openai("gpt-4o-2024-11-20"),
+            system: `
+              You are a helpful assistant that can do various tasks. If the user asks, then you can also schedule tasks to be executed later. The input may have a date/time/cron pattern to be input as an object into a scheduler The time is now: ${new Date().toISOString()}.
+              `,
+            messages: processedMessages,
+            tools,
+            onFinish,
+            maxSteps: 10,
+          });
 
-        // Merge the AI response stream with tool execution outputs
-        result.mergeIntoDataStream(dataStream);
-      },
+          // Merge the AI response stream with tool execution outputs
+          result.mergeIntoDataStream(dataStream);
+        },
+      });
+
+      return dataStreamResponse;
     });
-
-    return dataStreamResponse;
+  }
+  async executeTask(description: string, task: Schedule<string>) {
+    await this.saveMessages([
+      ...this.messages,
+      {
+        id: generateId(),
+        role: "user",
+        content: description,
+      },
+    ]);
+    return `Task executed: ${description}`;
   }
 }
 
