@@ -25,7 +25,7 @@ Built with [`agents-sdk`](https://developers.cloudflare.com/agents/) for serverl
 1. Create a new project:
 
 ```bash
-npm create cloudflare@latest -- --template threepointone/agents-starter
+npm create cloudflare@latest -- --template cloudflare/agents-starter
 ```
 
 2. Install dependencies:
