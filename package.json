@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
+  "private": true,
   "scripts": {
     "start": "vite dev",
     "deploy": "vite build && wrangler deploy",
@@ -33,7 +34,7 @@
   "dependencies": {
     "@ai-sdk/openai": "^1.1.14",
     "@ai-sdk/react": "^1.1.18",
-    "agents-sdk": "^0.0.21",
+    "agents-sdk": "^0.0.22",
     "ai": "^4.1.46",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
