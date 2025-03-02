@@ -118,11 +118,12 @@ export default function Chat() {
           </div>
 
           <div className="flex items-center gap-2 mr-2">
-            <Bug className="h-4 w-4 text-muted-foreground" />
+            <Bug className="h-4 w-4 text-muted-foreground/50 dark:text-gray-500" />
             <Switch
               checked={showDebug}
               onCheckedChange={setShowDebug}
               aria-label="Toggle debug mode"
+              className="data-[state=checked]:bg-gray-500 data-[state=unchecked]:bg-gray-300 dark:data-[state=unchecked]:bg-gray-700"
             />
           </div>
 
