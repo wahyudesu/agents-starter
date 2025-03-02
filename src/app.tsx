@@ -85,10 +85,12 @@ export default function Chat() {
   };
 
   return (
-    <div className="bg-background min-h-[100vh] mx-auto max-w-lg flex flex-col">
-      <div className="px-4 py-3 border-b border-border flex items-center gap-3 bg-background sticky top-0 z-10">
+    <div className="bg-background min-h-[100vh] mx-auto max-w-lg flex flex-col py-6">
+      <div className="px-4 py-3 border-b border-border flex items-center gap-3 bg-background sticky top-6 z-10">
         <Avatar className="h-8 w-8">
-          <AvatarFallback className="bg-blue-400 text-white">AI</AvatarFallback>
+          <AvatarFallback className="bg-[#F48120] text-white">
+            AI
+          </AvatarFallback>
         </Avatar>
 
         <div className="flex-1">
@@ -128,12 +130,12 @@ export default function Chat() {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-24">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-28">
         {messages.length === 0 && (
           <div className="h-full flex items-center justify-center">
             <Card className="bg-secondary/30 border-secondary/50 p-6 max-w-md mx-auto">
               <div className="text-center space-y-4">
-                <div className="bg-primary/10 text-primary rounded-full p-3 inline-flex">
+                <div className="bg-[#F48120]/10 text-[#F48120] rounded-full p-3 inline-flex">
                   <Bot className="h-6 w-6" />
                 </div>
                 <h3 className="font-semibold text-lg">Welcome to AI Chat</h3>
@@ -142,11 +144,11 @@ export default function Chat() {
                 </p>
                 <ul className="text-sm text-left space-y-2">
                   <li className="flex items-center gap-2">
-                    <span className="text-primary">•</span>
+                    <span className="text-[#F48120]">•</span>
                     <span>Weather information for any city</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-primary">•</span>
+                    <span className="text-[#F48120]">•</span>
                     <span>Local time in different locations</span>
                   </li>
                 </ul>
@@ -178,7 +180,9 @@ export default function Chat() {
                 >
                   {showAvatar && !isUser ? (
                     <Avatar className="h-8 w-8 mt-1 flex-shrink-0">
-                      <AvatarFallback>AI</AvatarFallback>
+                      <AvatarFallback className="bg-[#F48120] text-white">
+                        AI
+                      </AvatarFallback>
                     </Avatar>
                   ) : (
                     !isUser && <div className="w-8"></div>
@@ -194,7 +198,7 @@ export default function Chat() {
                                 className={`p-3 rounded-2xl ${
                                   isUser
                                     ? "bg-primary text-primary-foreground rounded-br-none"
-                                    : "rounded-bl-none"
+                                    : "rounded-bl-none border-assistant-border"
                                 } ${
                                   part.text.startsWith("scheduled message")
                                     ? "border-accent/50"
@@ -235,8 +239,8 @@ export default function Chat() {
                                 className="p-4 my-3 bg-secondary/30 border-secondary/50 rounded-xl"
                               >
                                 <div className="flex items-center gap-2 mb-3">
-                                  <div className="bg-primary/10 p-1.5 rounded-full">
-                                    <Bot className="h-4 w-4 text-primary" />
+                                  <div className="bg-[#F48120]/10 p-1.5 rounded-full">
+                                    <Bot className="h-4 w-4 text-[#F48120]" />
                                   </div>
                                   <h4 className="font-medium">
                                     {toolInvocation.toolName}
@@ -330,7 +334,7 @@ export default function Chat() {
             },
           })
         }
-        className="p-3 bg-muted fixed bottom-0 left-0 right-0 z-10 rounded-t-2xl max-w-lg mx-auto"
+        className="p-3 bg-muted fixed bottom-6 left-0 right-0 z-10 rounded-t-2xl max-w-lg mx-auto"
       >
         <div className="flex items-center gap-2">
           <div className="flex-1 relative">
