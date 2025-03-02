@@ -11,6 +11,15 @@
 
     <title>AI Chat Agent</title>
 
+    <script>
+      document.documentElement.classList.toggle(
+        "dark",
+        localStorage.theme === "dark" ||
+          (!("theme" in localStorage) &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches)
+      );
+    </script>
+
     <!-- Favicon support -->
     <link rel="icon" href="/favicon.ico" />
 
