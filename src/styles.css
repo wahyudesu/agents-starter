@@ -22,6 +22,7 @@
   --border: #faad3f;
   --assistant-border: #faad3f;
   --input: #faad3f;
+  --input-background: oklch(0.97 0 0);
   --ring: #f48120;
   --chart-1: #f48120;
   --chart-2: #faad3f;
@@ -59,6 +60,7 @@
   --border: #faad3f;
   --assistant-border: #8b4d14;
   --input: #faad3f;
+  --input-background: #0f0f10;
   --ring: #f48120;
   --chart-1: #f48120;
   --chart-2: #faad3f;
@@ -97,6 +99,7 @@
   --color-border: var(--border);
   --color-assistant-border: var(--assistant-border);
   --color-input: var(--input);
+  --color-input-background: var(--input-background);
   --color-ring: var(--ring);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
