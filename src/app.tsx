@@ -9,7 +9,7 @@ import { Card } from "./components/ui/card";
 import { Input } from "./components/ui/input";
 import { Avatar, AvatarFallback } from "./components/ui/avatar";
 import { Switch } from "./components/ui/switch";
-import { ArrowLeft, Send, Bot, Trash2, Sun, Moon, Bug } from "lucide-react";
+import { Send, Bot, Trash2, Sun, Moon, Bug } from "lucide-react";
 
 // List of tools that require human confirmation
 const toolsRequiringConfirmation: (keyof typeof tools)[] = [
@@ -85,14 +85,14 @@ export default function Chat() {
   };
 
   return (
-    <div className="bg-background min-h-[100vh] mx-auto max-w-lg">
+    <div className="bg-background min-h-[100vh] mx-auto max-w-lg flex flex-col">
       <div className="px-4 py-3 border-b border-border flex items-center gap-3 bg-background sticky top-0 z-10">
         <Avatar className="h-8 w-8">
           <AvatarFallback className="bg-blue-400 text-white">AI</AvatarFallback>
         </Avatar>
 
         <div className="flex-1">
-          <h2 className="font-semibold text-base">AI Chat Demo</h2>
+          <h2 className="font-semibold text-base">AI Chat Agent</h2>
         </div>
 
         <div className="flex items-center gap-2 mr-2">
@@ -128,7 +128,7 @@ export default function Chat() {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-24">
         {messages.length === 0 && (
           <div className="h-full flex items-center justify-center">
             <Card className="bg-secondary/30 border-secondary/50 p-6 max-w-md mx-auto">
@@ -185,18 +185,6 @@ export default function Chat() {
                   )}
 
                   <div>
-                    {showRole && (
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="text-xs font-medium capitalize">
-                          {m.role}
-                        </p>
-                        <div className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-xs flex items-center gap-1">
-                          <Bot className="h-3 w-3" />
-                          <span>AI</span>
-                        </div>
-                      </div>
-                    )}
-
                     <div>
                       {m.parts?.map((part, i) => {
                         if (part.type === "text") {
@@ -342,7 +330,7 @@ export default function Chat() {
             },
           })
         }
-        className="p-3 bg-muted bottom-0 sticky z-10 rounded-t-2xl"
+        className="p-3 bg-muted fixed bottom-0 left-0 right-0 z-10 rounded-t-2xl max-w-lg mx-auto"
       >
         <div className="flex items-center gap-2">
           <div className="flex-1 relative">
