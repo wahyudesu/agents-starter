@@ -245,7 +245,9 @@ export default function Chat() {
                                     isUser ? "text-right" : "text-left"
                                   }`}
                                 >
-                                  {formatTime(new Date())}
+                                  {formatTime(
+                                    new Date(m.createdAt as unknown as string)
+                                  )}
                                 </p>
                               </div>
                             );
