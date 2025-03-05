@@ -7,7 +7,7 @@ import {
   type ToolExecutionOptions,
   type ToolSet,
 } from "ai";
-import { z } from "zod";
+import type { z } from "zod";
 import { APPROVAL } from "./shared";
 
 function isValidToolName<K extends PropertyKey, T extends object>(
@@ -30,10 +30,11 @@ function isValidToolName<K extends PropertyKey, T extends object>(
 export async function processToolCalls<
   Tools extends ToolSet,
   ExecutableTools extends {
+    // biome-ignore lint/complexity/noBannedTypes: it's fine
     [Tool in keyof Tools as Tools[Tool] extends { execute: Function }
       ? never
       : Tool]: Tools[Tool];
-  }
+  },
 >({
   dataStream,
   messages,
@@ -46,7 +47,7 @@ export async function processToolCalls<
     [K in keyof Tools & keyof ExecutableTools]?: (
       args: z.infer<ExecutableTools[K]["parameters"]>,
       context: ToolExecutionOptions
-    ) => Promise<any>;
+    ) => Promise<unknown>;
   };
 }): Promise<Message[]> {
   const lastMessage = messages[messages.length - 1];
@@ -65,7 +66,7 @@ export async function processToolCalls<
       if (!(toolName in executions) || toolInvocation.state !== "result")
         return part;
 
-      let result;
+      let result: unknown;
 
       if (toolInvocation.result === APPROVAL.YES) {
         // Get the tool and check if the tool has an execute function.

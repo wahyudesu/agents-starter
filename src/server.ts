@@ -34,7 +34,9 @@ export class Chat extends AIChatAgent<Env> {
    * Handles incoming chat messages and manages the response stream
    * @param onFinish - Callback function executed when streaming completes
    */
-  async onChatMessage(onFinish: StreamTextOnFinishCallback<any>) {
+
+  // biome-ignore lint/complexity/noBannedTypes: <explanation>
+  async onChatMessage(onFinish: StreamTextOnFinishCallback<{}>) {
     // Create a streaming response that handles both text and tool outputs
     return agentContext.run(this, async () => {
       const dataStreamResponse = createDataStreamResponse({
