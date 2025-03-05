@@ -51,8 +51,8 @@ const scheduleTask = tool({
         type === "scheduled"
           ? new Date(when) // scheduled
           : type === "delayed"
-          ? when // delayed
-          : when, // cron
+            ? when // delayed
+            : when, // cron
         "executeTask",
         payload
       );
