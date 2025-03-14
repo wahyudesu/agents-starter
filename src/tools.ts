@@ -46,6 +46,7 @@ const scheduleTask = tool({
     if (!agent) {
       throw new Error("No agent found");
     }
+    console.log(agent.env.OPENAI_API_KEY);
     try {
       agent.schedule(
         type === "scheduled"
