@@ -9,7 +9,7 @@ import { agentContext } from "./server";
 import {
   unstable_getSchedulePrompt,
   unstable_scheduleSchema,
-} from "agents-sdk/schedule";
+} from "agents/schedule";
 
 /**
  * Weather information tool that requires human confirmation
