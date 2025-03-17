@@ -4,11 +4,11 @@ import {
   routeAgentRequest,
   type Agent,
   type Schedule,
-} from "agents-sdk";
+} from "agents";
 
-import { unstable_getSchedulePrompt } from "agents-sdk/schedule";
+import { unstable_getSchedulePrompt } from "agents/schedule";
 
-import { AIChatAgent } from "agents-sdk/ai-chat-agent";
+import { AIChatAgent } from "agents/ai-chat-agent";
 import {
   createDataStreamResponse,
   generateId,
