@@ -5,6 +5,9 @@ import {
   type Agent,
   type Schedule,
 } from "agents-sdk";
+
+import { unstable_getSchedulePrompt } from "agents-sdk/schedule";
+
 import { AIChatAgent } from "agents-sdk/ai-chat-agent";
 import {
   createDataStreamResponse,
@@ -64,12 +67,18 @@ export class Chat extends AIChatAgent<Env> {
           // Stream the AI response using GPT-4
           const result = streamText({
             model: openai("gpt-4o-2024-11-20"),
-            system: `
-              You are a helpful assistant that can do various tasks. If the user asks, then you can also schedule tasks to be executed later. The input may have a date/time/cron pattern to be input as an object into a scheduler The time is now: ${new Date().toISOString()}.
-              `,
+            system: `You are a helpful assistant that can do various tasks... 
+
+${unstable_getSchedulePrompt({ date: new Date() })}
+
+If the user asks to schedule a task, use the schedule tool to schedule the task.
+`,
             messages: processedMessages,
             tools,
             onFinish,
+            onError: (error) => {
+              console.error("error", error);
+            },
             maxSteps: 10,
           });
 
@@ -87,7 +96,8 @@ export class Chat extends AIChatAgent<Env> {
       {
         id: generateId(),
         role: "user",
-        content: `scheduled message: ${description}`,
+        content: `Running scheduled task: ${description}`,
+        createdAt: new Date(),
       },
     ]);
   }
