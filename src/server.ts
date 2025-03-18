@@ -1,10 +1,4 @@
-import {
-  type AgentNamespace,
-  type Connection,
-  routeAgentRequest,
-  type Agent,
-  type Schedule,
-} from "agents";
+import { routeAgentRequest, type Schedule } from "agents";
 
 import { unstable_getSchedulePrompt } from "agents/schedule";
 
@@ -12,7 +6,6 @@ import { AIChatAgent } from "agents/ai-chat-agent";
 import {
   createDataStreamResponse,
   generateId,
-  type Message,
   streamText,
   type StreamTextOnFinishCallback,
 } from "ai";
@@ -20,12 +13,6 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { processToolCalls } from "./utils";
 import { tools, executions } from "./tools";
 import { AsyncLocalStorage } from "node:async_hooks";
-
-// Environment variables type definition
-export type Env = {
-  OPENAI_API_KEY: string;
-  Chat: AgentNamespace<Chat>;
-};
 
 // we use ALS to expose the agent context to the tools
 export const agentContext = new AsyncLocalStorage<Chat>();
