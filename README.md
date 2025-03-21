@@ -156,19 +156,15 @@ Replace the `@ai-sdk/openai` import and usage with the `workers-ai-provider`:
 ```diff
 // server.ts
 // Change the imports
-- import { createOpenAI } from "@ai-sdk/openai";
+- import { openai } from "@ai-sdk/openai";
 + import { createWorkersAI } from 'workers-ai-provider';
 
 // Create a Workers AI instance
-- const openai = createOpenAI({
--     apiKey: this.env.OPENAI_API_KEY,
-- });
 + const workersai = createWorkersAI({ binding: env.AI });
 
 // Use it when calling the streamText method (or other methods)
 // from the ai-sdk
-- const result = streamText({
--    model: openai("gpt-4o-2024-11-20"),
+- const model = openai("gpt-4o-2024-11-20");
 + const model = workersai("@cf/deepseek-ai/deepseek-r1-distill-qwen-32b")
 ```
 
