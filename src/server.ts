@@ -9,10 +9,18 @@ import {
   streamText,
   type StreamTextOnFinishCallback,
 } from "ai";
-import { createOpenAI } from "@ai-sdk/openai";
+import { openai } from "@ai-sdk/openai";
 import { processToolCalls } from "./utils";
 import { tools, executions } from "./tools";
 import { AsyncLocalStorage } from "node:async_hooks";
+// import { env } from "cloudflare:workers";
+
+const model = openai("gpt-4o-2024-11-20");
+// Cloudflare AI Gateway
+// const openai = createOpenAI({
+//   apiKey: env.OPENAI_API_KEY,
+//   baseURL: env.GATEWAY_BASE_URL,
+// });
 
 // we use ALS to expose the agent context to the tools
 export const agentContext = new AsyncLocalStorage<Chat>();
@@ -40,20 +48,9 @@ export class Chat extends AIChatAgent<Env> {
             executions,
           });
 
-          // Initialize OpenAI client with API key from environment
-          const openai = createOpenAI({
-            apiKey: this.env.OPENAI_API_KEY,
-          });
-
-          // Cloudflare AI Gateway
-          // const openai = createOpenAI({
-          //   apiKey: this.env.OPENAI_API_KEY,
-          //   baseURL: this.env.GATEWAY_BASE_URL,
-          // });
-
           // Stream the AI response using GPT-4
           const result = streamText({
-            model: openai("gpt-4o-2024-11-20"),
+            model,
             system: `You are a helpful assistant that can do various tasks... 
 
 ${unstable_getSchedulePrompt({ date: new Date() })}
@@ -95,7 +92,7 @@ If the user asks to schedule a task, use the schedule tool to schedule the task.
  */
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
-    if (!env.OPENAI_API_KEY) {
+    if (!process.env.OPENAI_API_KEY) {
       console.error(
         "OPENAI_API_KEY is not set, don't forget to set it locally in .dev.vars, and use `wrangler secret bulk .dev.vars` to upload it to production"
       );
