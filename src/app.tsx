@@ -6,9 +6,9 @@ import { APPROVAL } from "./shared";
 import type { tools } from "./tools";
 
 // Component imports
-import { Button } from "./components/button/Button";
-import { Card } from "./components/card/Card";
-import { Input } from "./components/input/Input";
+import { Button } from "@/components/button/Button";
+import { Card } from "@/components/card/Card";
+import { Input } from "@/components/input/Input";
 import { Avatar } from "@/components/avatar/Avatar";
 import { Toggle } from "@/components/toggle/Toggle";
 import { Tooltip } from "@/components/tooltip/Tooltip";
