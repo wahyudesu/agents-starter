@@ -52,7 +52,7 @@ export class Chat extends AIChatAgent<Env> {
           const result = streamText({
             model: createWorkersAI({
               binding: this.env.ai,
-            })("@cf/meta/llama-3.3-70b-instruct-fp8-fast"),
+            })("@cf/mistralai/mistral-small-3.1-24b-instruct"),
             // HERE MICHELLE
             system: `You are a helpful assistant that can do various tasks... 
 
