@@ -92,11 +92,18 @@ If the user asks to schedule a task, use the schedule tool to schedule the task.
  */
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
+    const url = new URL(request.url);
+
+    if (url.pathname === "/check-open-ai-key") {
+      const hasOpenAIKey = !!process.env.OPENAI_API_KEY;
+      return Response.json({
+        success: hasOpenAIKey,
+      });
+    }
     if (!process.env.OPENAI_API_KEY) {
       console.error(
         "OPENAI_API_KEY is not set, don't forget to set it locally in .dev.vars, and use `wrangler secret bulk .dev.vars` to upload it to production"
       );
-      return new Response("OPENAI_API_KEY is not set", { status: 500 });
     }
     return (
       // Route the request to our agent or return 404 if not found
