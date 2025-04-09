@@ -76,7 +76,7 @@ export const Modal = ({
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, modalRef.current]);
 
   if (!isOpen) return null;
 

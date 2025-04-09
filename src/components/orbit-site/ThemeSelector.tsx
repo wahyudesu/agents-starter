@@ -14,6 +14,7 @@ const ThemeSelector = () => {
 
   return (
     <button
+      type="button"
       className="flex size-8 cursor-pointer items-center justify-center rounded-md hover:bg-neutral-200/60 dark:hover:bg-neutral-900"
       onClick={() => toggleTheme()}
     >

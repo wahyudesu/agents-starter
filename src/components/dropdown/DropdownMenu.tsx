@@ -41,7 +41,7 @@ export type MenuItemProps = {
   icon?: React.ReactNode;
   label?: string | React.ReactNode;
   checked?: boolean;
-  onClick?: (event: any) => void;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   titleContent?: React.ReactNode;
   type: "button" | "link" | "divider" | "title" | "checkbox" | string;
 };
@@ -123,19 +123,25 @@ const DropdownMenu = ({
               <header
                 className="px-2.5 py-2.5 dark:border-neutral-800"
                 onClick={(e) => e.preventDefault()}
+                onKeyDown={(e) => e.preventDefault()}
+                // biome-ignore lint/suspicious/noArrayIndexKey: TODO
                 key={index}
               >
                 {item.titleContent}
               </header>
             );
-          } else if (item.type === "divider") {
+          }
+          if (item.type === "divider") {
             return (
+              // biome-ignore lint/suspicious/noArrayIndexKey: TODO
               <div className="my-1.5 w-full px-2.5" key={index}>
                 <div className="h-px w-full bg-neutral-200 dark:bg-neutral-800" />
               </div>
             );
-          } else if (item.type === "link" || item.type === "button") {
+          }
+          if (item.type === "link" || item.type === "button") {
             return (
+              // biome-ignore lint/suspicious/noArrayIndexKey: TODO
               <DropdownMenuPrimitive.Item asChild key={index}>
                 {item.type === "link" ? (
                   <a
@@ -154,6 +160,7 @@ const DropdownMenu = ({
                   </a>
                 ) : (
                   <button
+                    type="button"
                     onClick={item.onClick}
                     className={cn(
                       "radix-highlighted:bg-neutral-100 radix-highlighted:text-neutral-950 dark:radix-highlighted:bg-neutral-800 dark:radix-highlighted:text-white flex w-full items-center justify-between gap-5 rounded-md p-2.5 text-neutral-700 focus:outline-none dark:text-neutral-300",

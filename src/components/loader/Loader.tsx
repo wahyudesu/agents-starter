@@ -1,9 +1,14 @@
 type LoaderProps = {
   className?: string;
   size?: number;
+  title?: string;
 };
 
-export const Loader = ({ className, size = 24 }: LoaderProps) => (
+export const Loader = ({
+  className,
+  size = 24,
+  title = "Loading...",
+}: LoaderProps) => (
   <svg
     width="24"
     height="24"
@@ -13,6 +18,7 @@ export const Loader = ({ className, size = 24 }: LoaderProps) => (
     className={className}
     style={{ height: size ?? undefined, width: size ?? undefined }}
   >
+    <title>{title}</title>
     <circle
       cx="12"
       cy="12"

@@ -29,24 +29,24 @@ export const Tooltip = ({ children, className, content, id }: TooltipProps) => {
 
   const isVisible = activeTooltip === tooltipIdentifier;
 
-  const detectCollision = () => {
-    const ref = tooltipRef.current;
-
-    if (ref) {
-      const tooltipRect = ref.getBoundingClientRect();
-      const { top, left, bottom, right } = tooltipRect;
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
-
-      if (top <= 0) setPositionY("bottom");
-      if (left <= 0) setPositionX("left");
-      if (bottom >= viewportHeight) setPositionY("top");
-      if (right >= viewportWidth) setPositionX("right");
-    }
-  };
-
   // detect collision once the tooltip is visible
   useLayoutEffect(() => {
+    const detectCollision = () => {
+      const ref = tooltipRef.current;
+
+      if (ref) {
+        const tooltipRect = ref.getBoundingClientRect();
+        const { top, left, bottom, right } = tooltipRect;
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+
+        if (top <= 0) setPositionY("bottom");
+        if (left <= 0) setPositionX("left");
+        if (bottom >= viewportHeight) setPositionY("top");
+        if (right >= viewportWidth) setPositionX("right");
+      }
+    };
+
     if (!isVisible) {
       setPositionX("center");
       setPositionY("top");
