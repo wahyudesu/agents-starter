@@ -68,6 +68,56 @@ const scheduleTask = tool({
     return `Task scheduled for type "${when.type}" : ${input}`;
   },
 });
+
+/**
+ * Tool to list all scheduled tasks
+ * This executes automatically without requiring human confirmation
+ */
+const getScheduledTasks = tool({
+  description: "List all tasks that have been scheduled",
+  parameters: z.object({}),
+  execute: async () => {
+    const agent = agentContext.getStore();
+    if (!agent) {
+      throw new Error("No agent found");
+    }
+    try {
+      const tasks = agent.getSchedules();
+      if (!tasks || tasks.length === 0) {
+        return "No scheduled tasks found.";
+      }
+      return tasks;
+    } catch (error) {
+      console.error("Error listing scheduled tasks", error);
+      return `Error listing scheduled tasks: ${error}`;
+    }
+  },
+});
+
+/**
+ * Tool to cancel a scheduled task by its ID
+ * This executes automatically without requiring human confirmation
+ */
+const cancelScheduledTask = tool({
+  description: "Cancel a scheduled task using its ID",
+  parameters: z.object({
+    taskId: z.string().describe("The ID of the task to cancel"),
+  }),
+  execute: async ({ taskId }) => {
+    const agent = agentContext.getStore();
+    if (!agent) {
+      throw new Error("No agent found");
+    }
+    try {
+      await agent.cancelSchedule(taskId);
+      return `Task ${taskId} has been successfully canceled.`;
+    } catch (error) {
+      console.error("Error canceling scheduled task", error);
+      return `Error canceling task ${taskId}: ${error}`;
+    }
+  },
+});
+
 /**
  * Export all available tools
  * These will be provided to the AI model to describe available capabilities
@@ -76,6 +126,8 @@ export const tools = {
   getWeatherInformation,
   getLocalTime,
   scheduleTask,
+  getScheduledTasks,
+  cancelScheduledTask,
 };
 
 /**
