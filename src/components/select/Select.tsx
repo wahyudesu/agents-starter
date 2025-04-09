@@ -26,7 +26,7 @@ export const Select = ({
 
   return (
     <select
-      onPointerDown={(e: React.PointerEvent) => {
+      onPointerDown={(e: React.PointerEvent<HTMLSelectElement>) => {
         if (e.pointerType === "mouse") {
           setIsPointer(true);
         }
@@ -56,6 +56,7 @@ export const Select = ({
     >
       {placeholder && <option value={undefined}>{placeholder}</option>}
       {options.map((option, index) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: TODO
         <option value={option.value} key={index}>
           {option.value}
         </option>

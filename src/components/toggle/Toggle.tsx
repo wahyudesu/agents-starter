@@ -9,6 +9,7 @@ type ToggleProps = {
 export const Toggle = ({ onClick, size = "base", toggled }: ToggleProps) => {
   return (
     <button
+      type="button"
       className={cn(
         "ob-focus interactive dark:bg-neutral-750 bg-neutral-250 cursor-pointer rounded-full border border-transparent p-1 transition-colors hover:bg-neutral-300 dark:hover:bg-neutral-700",
         {

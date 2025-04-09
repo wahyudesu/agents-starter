@@ -1,6 +1,6 @@
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { useMenuNavigation } from "@/hooks/useMenuNavigation";
-import { cn } from "@/utils/tw";
+import { cn } from "@/lib/utils";
 import { IconContext } from "@phosphor-icons/react";
 import { useRef } from "react";
 
@@ -25,6 +25,7 @@ const MenuOption = ({
     className="first-of-type:*:first:rounded-l-lg last-of-type:*:first:rounded-r-lg"
   >
     <button
+      type="button"
       className={cn(
         "text-ob-base-100 hover:text-ob-base-300 border-ob-border focus:inset-ring-focus focus-visible:border-ob-focus relative -ml-px flex h-full w-11 cursor-pointer items-center justify-center border transition-colors focus:z-10 focus:outline-none focus-visible:z-10 focus-visible:inset-ring-[0.5]",
         {
@@ -66,6 +67,7 @@ export const MenuBar = ({
     >
       {options.map((option, index) => (
         <MenuOption
+          // biome-ignore lint/suspicious/noArrayIndexKey: TODO
           key={index}
           {...option}
           isActive={isActive}
