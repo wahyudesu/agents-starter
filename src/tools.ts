@@ -5,7 +5,8 @@
 import { tool } from "ai";
 import { z } from "zod";
 
-import { agentContext } from "./server";
+import type { Chat } from "./server";
+import { getCurrentAgent } from "agents";
 import {
   unstable_getSchedulePrompt,
   unstable_scheduleSchema,
@@ -41,10 +42,8 @@ const scheduleTask = tool({
   parameters: unstable_scheduleSchema,
   execute: async ({ when, description }) => {
     // we can now read the agent context from the ALS store
-    const agent = agentContext.getStore();
-    if (!agent) {
-      throw new Error("No agent found");
-    }
+    const { agent } = getCurrentAgent<Chat>();
+
     function throwError(msg: string): string {
       throw new Error(msg);
     }
@@ -77,10 +76,8 @@ const getScheduledTasks = tool({
   description: "List all tasks that have been scheduled",
   parameters: z.object({}),
   execute: async () => {
-    const agent = agentContext.getStore();
-    if (!agent) {
-      throw new Error("No agent found");
-    }
+    const { agent } = getCurrentAgent<Chat>();
+
     try {
       const tasks = agent.getSchedules();
       if (!tasks || tasks.length === 0) {
@@ -104,10 +101,7 @@ const cancelScheduledTask = tool({
     taskId: z.string().describe("The ID of the task to cancel"),
   }),
   execute: async ({ taskId }) => {
-    const agent = agentContext.getStore();
-    if (!agent) {
-      throw new Error("No agent found");
-    }
+    const { agent } = getCurrentAgent<Chat>();
     try {
       await agent.cancelSchedule(taskId);
       return `Task ${taskId} has been successfully canceled.`;
