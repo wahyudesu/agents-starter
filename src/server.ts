@@ -8,6 +8,7 @@ import {
   generateId,
   streamText,
   type StreamTextOnFinishCallback,
+  type ToolSet,
 } from "ai";
 import { openai } from "@ai-sdk/openai";
 import { processToolCalls } from "./utils";
@@ -30,15 +31,21 @@ export class Chat extends AIChatAgent<Env> {
    * @param onFinish - Callback function executed when streaming completes
    */
 
-  // biome-ignore lint/complexity/noBannedTypes: <explanation>
-  async onChatMessage(onFinish: StreamTextOnFinishCallback<{}>) {
-    // Create a streaming response that handles both text and tool outputs
+  async onChatMessage(
+    onFinish: StreamTextOnFinishCallback<ToolSet>,
+    options?: { abortSignal?: AbortSignal }
+  ) {
+    // const mcpConnection = await this.mcp.connect(
+    //   "https://path-to-mcp-server/sse"
+    // );
 
+    // Collect all tools, including MCP tools
     const allTools = {
       ...tools,
       ...this.mcp.unstable_getAITools(),
     };
 
+    // Create a streaming response that handles both text and tool outputs
     const dataStreamResponse = createDataStreamResponse({
       execute: async (dataStream) => {
         // Process any pending tool calls from previous messages
@@ -61,7 +68,12 @@ If the user asks to schedule a task, use the schedule tool to schedule the task.
 `,
           messages: processedMessages,
           tools: allTools,
-          onFinish,
+          onFinish: async (args) => {
+            onFinish(
+              args as Parameters<StreamTextOnFinishCallback<ToolSet>>[0]
+            );
+            // await this.mcp.closeConnection(mcpConnection.id);
+          },
           onError: (error) => {
             console.error("Error while streaming:", error);
           },
