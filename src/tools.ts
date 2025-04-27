@@ -56,7 +56,7 @@ const scheduleTask = tool({
             ? when.cron // cron
             : throwError("not a valid schedule input");
     try {
-      agent.schedule(input!, "executeTask", description);
+      agent!.schedule(input!, "executeTask", description);
     } catch (error) {
       console.error("error scheduling task", error);
       return `Error scheduling task: ${error}`;
@@ -76,7 +76,7 @@ const getScheduledTasks = tool({
     const { agent } = getCurrentAgent<Chat>();
 
     try {
-      const tasks = agent.getSchedules();
+      const tasks = agent!.getSchedules();
       if (!tasks || tasks.length === 0) {
         return "No scheduled tasks found.";
       }
@@ -100,7 +100,7 @@ const cancelScheduledTask = tool({
   execute: async ({ taskId }) => {
     const { agent } = getCurrentAgent<Chat>();
     try {
-      await agent.cancelSchedule(taskId);
+      await agent!.cancelSchedule(taskId);
       return `Task ${taskId} has been successfully canceled.`;
     } catch (error) {
       console.error("Error canceling scheduled task", error);
