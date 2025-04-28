@@ -12,6 +12,7 @@ import { Input } from "@/components/input/Input";
 import { Avatar } from "@/components/avatar/Avatar";
 import { Toggle } from "@/components/toggle/Toggle";
 import { Tooltip } from "@/components/tooltip/Tooltip";
+import { MemoizedMarkdown } from './components/memoized-markdown';
 
 // Icon imports
 import {
@@ -218,7 +219,6 @@ export default function Chat() {
                         {m.parts?.map((part, i) => {
                           if (part.type === "text") {
                             return (
-                              // biome-ignore lint/suspicious/noArrayIndexKey: it's fine here
                               <div key={i}>
                                 <Card
                                   className={`p-3 rounded-md bg-neutral-100 dark:bg-neutral-900 ${
@@ -238,12 +238,7 @@ export default function Chat() {
                                       🕒
                                     </span>
                                   )}
-                                  <p className="text-sm whitespace-pre-wrap">
-                                    {part.text.replace(
-                                      /^scheduled message: /,
-                                      ""
-                                    )}
-                                  </p>
+                                  <MemoizedMarkdown id={m.id + '-' + i} content={part.text} />
                                 </Card>
                                 <p
                                   className={`text-xs text-muted-foreground mt-1 ${
