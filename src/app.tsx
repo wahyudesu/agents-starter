@@ -238,7 +238,7 @@ export default function Chat() {
                                       🕒
                                     </span>
                                   )}
-                                  <MemoizedMarkdown id={m.id + '-' + i} content={part.text} />
+                                  <MemoizedMarkdown id={`${m.id}-${i}`} content={part.text.replace(/^scheduled message: /,"")} />
                                 </Card>
                                 <p
                                   className={`text-xs text-muted-foreground mt-1 ${
