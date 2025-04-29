@@ -30,6 +30,134 @@ const toolsRequiringConfirmation: (keyof typeof tools)[] = [
   "getWeatherInformation",
 ];
 
+interface ToolInvocation {
+  toolName: string;
+  toolCallId: string;
+  state: 'call' | 'result' | 'partial-call';
+  step?: number;
+  args: Record<string, unknown>;
+  result?: {
+    content?: Array<{ type: string; text: string }>;
+  };
+}
+
+function ToolInvocationCard({ 
+  toolInvocation, 
+  toolCallId, 
+  needsConfirmation, 
+  addToolResult 
+}: { 
+  toolInvocation: ToolInvocation;
+  toolCallId: string;
+  needsConfirmation: boolean;
+  addToolResult: (args: { toolCallId: string; result: string }) => void;
+}) {
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  return (
+    <Card
+      className={`p-4 my-3 w-full max-w-[500px] rounded-md bg-neutral-100 dark:bg-neutral-900 ${
+        needsConfirmation ? "" : "border-[#F48120]/30"
+      } overflow-hidden`}
+    >
+      <button 
+        type="button"
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="w-full flex items-center gap-2 cursor-pointer"
+      >
+        <div className={`${needsConfirmation ? "bg-[#F48120]/10" : "bg-[#F48120]/5"} p-1.5 rounded-full flex-shrink-0`}>
+          <Robot
+            size={16}
+            className="text-[#F48120]"
+          />
+        </div>
+        <h4 className="font-medium flex items-center gap-2 flex-1 text-left">
+          {toolInvocation.toolName}
+          {!needsConfirmation && toolInvocation.state === "result" && (
+            <span className="text-xs text-[#F48120]/70">✓ Completed</span>
+          )}
+        </h4>
+        <CaretDown 
+          size={16} 
+          className={`text-muted-foreground transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+        />
+      </button>
+
+      <div className={`transition-all duration-200 ${isExpanded ? 'max-h-[200px] opacity-100 mt-3' : 'max-h-0 opacity-0 overflow-hidden'}`}>
+        <div className="overflow-y-auto" style={{ maxHeight: isExpanded ? '180px' : '0px' }}>
+          <div className="mb-3">
+            <h5 className="text-xs font-medium mb-1 text-muted-foreground">
+              Arguments:
+            </h5>
+            <pre className="bg-background/80 p-2 rounded-md text-xs overflow-auto whitespace-pre-wrap break-words max-w-[450px]">
+              {JSON.stringify(
+                toolInvocation.args,
+                null,
+                2
+              )}
+            </pre>
+          </div>
+
+          {needsConfirmation && toolInvocation.state === "call" && (
+            <div className="flex gap-2 justify-end">
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() =>
+                  addToolResult({
+                    toolCallId,
+                    result: APPROVAL.NO,
+                  })
+                }
+              >
+                Reject
+              </Button>
+              <Tooltip content={"Accept action"}>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() =>
+                    addToolResult({
+                      toolCallId,
+                      result: APPROVAL.YES,
+                    })
+                  }
+                >
+                  Approve
+                </Button>
+              </Tooltip>
+            </div>
+          )}
+
+          {!needsConfirmation && toolInvocation.state === "result" && (
+            <div className="mt-3 border-t border-[#F48120]/10 pt-3">
+              <h5 className="text-xs font-medium mb-1 text-muted-foreground">
+                Result:
+              </h5>
+              <pre className="bg-background/80 p-2 rounded-md text-xs overflow-auto whitespace-pre-wrap break-words max-w-[450px]">
+{(() => {
+  const result = toolInvocation.result;
+  if (typeof result === 'object' && result.content) {
+    return result.content
+      .map((item: { type: string; text: string }) => {
+        if (item.type === 'text' && item.text.startsWith('\n~ Page URL:')) {
+          const lines = item.text.split('\n').filter(Boolean);
+          return lines.map((line: string) => `- ${line.replace('\n~ ', '')}`).join('\n');
+        }
+        return item.text;
+      })
+      .join('\n');
+  }
+  return JSON.stringify(result, null, 2);
+})()}</pre>
+            </div>
+          )}
+        </div>
+      </div>
+    </Card>
+  );
+}
+
 export default function Chat() {
   const [theme, setTheme] = useState<"dark" | "light">(() => {
     // Check localStorage first, default to dark if not found
@@ -267,120 +395,19 @@ export default function Chat() {
                             const needsConfirmation = toolsRequiringConfirmation.includes(
                               toolInvocation.toolName as keyof typeof tools
                             );
-                            const [isExpanded, setIsExpanded] = useState(true);
 
                             // Skip rendering the card in debug mode
                             if (showDebug) return null;
 
                             return (
-                              <Card
-                                // biome-ignore lint/suspicious/noArrayIndexKey: it's fine here
-                                key={i}
-                                className={`p-4 my-3 w-full max-w-[500px] rounded-md bg-neutral-100 dark:bg-neutral-900 ${
-                                  needsConfirmation ? "" : "border-[#F48120]/30"
-                                } overflow-hidden`}
-                              >
-                                {(() => {
-                                  return (
-                                    <>
-                                      <button 
-                                        type="button"
-                                        onClick={() => setIsExpanded(!isExpanded)}
-                                        className="w-full flex items-center gap-2 cursor-pointer"
-                                      >
-                                        <div className={`${needsConfirmation ? "bg-[#F48120]/10" : "bg-[#F48120]/5"} p-1.5 rounded-full flex-shrink-0`}>
-                                          <Robot
-                                            size={16}
-                                            className="text-[#F48120]"
-                                          />
-                                        </div>
-                                        <h4 className="font-medium flex items-center gap-2 flex-1 text-left">
-                                          {toolInvocation.toolName}
-                                          {!needsConfirmation && toolInvocation.state === "result" && (
-                                            <span className="text-xs text-[#F48120]/70">✓ Completed</span>
-                                          )}
-                                        </h4>
-                                        <CaretDown 
-                                          size={16} 
-                                          className={`text-muted-foreground transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-                                        />
-                                      </button>
-
-                                      <div className={`transition-all duration-200 ${isExpanded ? 'max-h-[200px] opacity-100 mt-3' : 'max-h-0 opacity-0 overflow-hidden'}`}>
-                                        <div className="overflow-y-auto" style={{ maxHeight: isExpanded ? '180px' : '0px' }}>
-                                          <div className="mb-3">
-                                            <h5 className="text-xs font-medium mb-1 text-muted-foreground">
-                                              Arguments:
-                                            </h5>
-                                            <pre className="bg-background/80 p-2 rounded-md text-xs overflow-auto whitespace-pre-wrap break-words max-w-[450px]">
-                                              {JSON.stringify(
-                                                toolInvocation.args,
-                                                null,
-                                                2
-                                              )}
-                                            </pre>
-                                          </div>
-
-                                          {needsConfirmation && toolInvocation.state === "call" && (
-                                            <div className="flex gap-2 justify-end">
-                                              <Button
-                                                variant="primary"
-                                                size="sm"
-                                                onClick={() =>
-                                                  addToolResult({
-                                                    toolCallId,
-                                                    result: APPROVAL.NO,
-                                                  })
-                                                }
-                                              >
-                                                Reject
-                                              </Button>
-                                              <Tooltip content={"Accept action"}>
-                                                <Button
-                                                  variant="primary"
-                                                  size="sm"
-                                                  onClick={() =>
-                                                    addToolResult({
-                                                      toolCallId,
-                                                      result: APPROVAL.YES,
-                                                    })
-                                                  }
-                                                >
-                                                  Approve
-                                                </Button>
-                                              </Tooltip>
-                                            </div>
-                                          )}
-
-                                          {!needsConfirmation && toolInvocation.state === "result" && (
-                                            <div className="mt-3 border-t border-[#F48120]/10 pt-3">
-                                              <h5 className="text-xs font-medium mb-1 text-muted-foreground">
-                                                Result:
-                                              </h5>
-                                              <pre className="bg-background/80 p-2 rounded-md text-xs overflow-auto whitespace-pre-wrap break-words max-w-[450px]">
-{(() => {
-  const result = toolInvocation.result;
-  if (typeof result === 'object' && result.content) {
-    return result.content
-      .map((item: { type: string; text: string }) => {
-        if (item.type === 'text' && item.text.startsWith('\n~ Page URL:')) {
-          const lines = item.text.split('\n').filter(Boolean);
-          return lines.map((line: string) => `- ${line.replace('\n~ ', '')}`).join('\n');
-        }
-        return item.text;
-      })
-      .join('\n');
-  }
-  return JSON.stringify(result, null, 2);
-})()}</pre>
-                                            </div>
-                                          )}
-                                        </div>
-                                      </div>
-                                    </>
-                                  );
-                                })()}
-                              </Card>
+                              <ToolInvocationCard
+                                // biome-ignore lint/suspicious/noArrayIndexKey: using index is safe here as the array is static
+                                key={`${toolCallId}-${i}`}
+                                toolInvocation={toolInvocation}
+                                toolCallId={toolCallId}
+                                needsConfirmation={needsConfirmation}
+                                addToolResult={addToolResult}
+                              />
                             );
                           }
                           return null;
