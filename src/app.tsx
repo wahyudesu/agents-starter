@@ -356,7 +356,7 @@ export default function Chat() {
             });
             setTextareaHeight('auto'); // Reset height after submission
           }}
-          className="p-3 bg-input-background absolute bottom-0 left-0 right-0 z-10 border-t border-neutral-300 dark:border-neutral-800"
+          className="p-3 bg-gray-50 absolute bottom-0 left-0 right-0 z-10 border-t border-neutral-300 dark:border-neutral-800"
         >
           <div className="flex items-center gap-2">
             <div className="flex-1 relative">
