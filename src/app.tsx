@@ -274,11 +274,11 @@ export default function Chat() {
                               <Card
                                 // biome-ignore lint/suspicious/noArrayIndexKey: it's fine here
                                 key={i}
-                                className={`p-4 my-3 rounded-md bg-neutral-100 dark:bg-neutral-900 ${
+                                className={`p-4 my-3 w-full max-w-[500px] rounded-md bg-neutral-100 dark:bg-neutral-900 ${
                                   needsConfirmation ? "" : "border-[#F48120]/30"
-                                }`}
+                                } max-h-[200px] overflow-y-auto`}
                               >
-                                <div className="flex items-center gap-2 mb-3">
+                                <div className="flex items-center gap-2 mb-3 sticky top-0 bg-neutral-100 dark:bg-neutral-900 py-1">
                                   <div className={`${needsConfirmation ? "bg-[#F48120]/10" : "bg-[#F48120]/5"} p-1.5 rounded-full`}>
                                     <Robot
                                       size={16}
@@ -297,7 +297,7 @@ export default function Chat() {
                                   <h5 className="text-xs font-medium mb-1 text-muted-foreground">
                                     Arguments:
                                   </h5>
-                                  <pre className="bg-background/80 p-2 rounded-md text-xs overflow-auto">
+                                  <pre className="bg-background/80 p-2 rounded-md text-xs overflow-auto whitespace-pre-wrap break-words max-w-[450px]">
                                     {JSON.stringify(
                                       toolInvocation.args,
                                       null,
@@ -342,13 +342,22 @@ export default function Chat() {
                                     <h5 className="text-xs font-medium mb-1 text-muted-foreground">
                                       Result:
                                     </h5>
-                                    <pre className="bg-background/80 p-2 rounded-md text-xs overflow-auto">
-                                      {JSON.stringify(
-                                        toolInvocation.result,
-                                        null,
-                                        2
-                                      )}
-                                    </pre>
+                                    <pre className="bg-background/80 p-2 rounded-md text-xs overflow-auto whitespace-pre-wrap break-words max-w-[450px]">
+{(() => {
+  const result = toolInvocation.result;
+  if (typeof result === 'object' && result.content) {
+    return result.content
+      .map((item: { type: string; text: string }) => {
+        if (item.type === 'text' && item.text.startsWith('\n~ Page URL:')) {
+          const lines = item.text.split('\n').filter(Boolean);
+          return lines.map((line: string) => `- ${line.replace('\n~ ', '')}`).join('\n');
+        }
+        return item.text;
+      })
+      .join('\n');
+  }
+  return JSON.stringify(result, null, 2);
+})()}</pre>
                                   </div>
                                 )}
                               </Card>
