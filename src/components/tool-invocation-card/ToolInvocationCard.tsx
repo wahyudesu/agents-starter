@@ -29,7 +29,7 @@ export function ToolInvocationCard({
   needsConfirmation, 
   addToolResult 
 }: ToolInvocationCardProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   return (
     <Card
@@ -112,21 +112,21 @@ export function ToolInvocationCard({
                 Result:
               </h5>
               <pre className="bg-background/80 p-2 rounded-md text-xs overflow-auto whitespace-pre-wrap break-words max-w-[450px]">
-{(() => {
-  const result = toolInvocation.result;
-  if (typeof result === 'object' && result.content) {
-    return result.content
-      .map((item: { type: string; text: string }) => {
-        if (item.type === 'text' && item.text.startsWith('\n~ Page URL:')) {
-          const lines = item.text.split('\n').filter(Boolean);
-          return lines.map((line: string) => `- ${line.replace('\n~ ', '')}`).join('\n');
-        }
-        return item.text;
-      })
-      .join('\n');
-  }
-  return JSON.stringify(result, null, 2);
-})()}</pre>
+                {(() => {
+                const result = toolInvocation.result;
+                if (typeof result === 'object' && result.content) {
+                    return result.content
+                    .map((item: { type: string; text: string }) => {
+                        if (item.type === 'text' && item.text.startsWith('\n~ Page URL:')) {
+                        const lines = item.text.split('\n').filter(Boolean);
+                        return lines.map((line: string) => `- ${line.replace('\n~ ', '')}`).join('\n');
+                        }
+                        return item.text;
+                    })
+                    .join('\n');
+                }
+                return JSON.stringify(result, null, 2);
+                })()}</pre>
             </div>
           )}
         </div>
