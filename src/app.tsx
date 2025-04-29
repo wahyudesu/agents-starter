@@ -20,6 +20,7 @@ import {
   Sun,
   Trash,
   PaperclipHorizontal,
+  PaperPlaneTilt,
 } from "@phosphor-icons/react";
 
 // List of tools that require human confirmation
@@ -413,10 +414,7 @@ export default function Chat() {
                   className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full p-1.5 h-fit border dark:border-zinc-600"
                   disabled={pendingToolCallConfirmation || !agentInput.trim()}
                 >
-                  <svg height="14" strokeLinejoin="round" viewBox="0 0 16 16" width="14" style={{ color: 'currentcolor' }} aria-label="Send message">
-                    <title>Send message</title>
-                    <path fillRule="evenodd" clipRule="evenodd" d="M8.70711 1.39644C8.31659 1.00592 7.68342 1.00592 7.2929 1.39644L2.21968 6.46966L1.68935 6.99999L2.75001 8.06065L3.28034 7.53032L7.25001 3.56065V14.25V15H8.75001V14.25V3.56065L12.7197 7.53032L13.25 8.06065L14.3107 6.99999L13.7803 6.46966L8.70711 1.39644Z" fill="currentColor" />
-                  </svg>
+                  <PaperPlaneTilt size={16} />
                 </button>
               </div>
             </div>
