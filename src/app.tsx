@@ -278,17 +278,17 @@ export default function Chat() {
                                   needsConfirmation ? "" : "border-[#F48120]/30"
                                 } max-h-[200px] overflow-y-auto`}
                               >
-                                <div className="flex items-center gap-2 mb-3 sticky top-0 bg-neutral-100 dark:bg-neutral-900 py-1">
-                                  <div className={`${needsConfirmation ? "bg-[#F48120]/10" : "bg-[#F48120]/5"} p-1.5 rounded-full`}>
+                                <div className="flex items-center gap-2 mb-3">
+                                  <div className={`${needsConfirmation ? "bg-[#F48120]/10" : "bg-[#F48120]/5"} p-1.5 rounded-full flex-shrink-0`}>
                                     <Robot
                                       size={16}
                                       className="text-[#F48120]"
                                     />
                                   </div>
-                                  <h4 className="font-medium">
+                                  <h4 className="font-medium flex items-center gap-2">
                                     {toolInvocation.toolName}
                                     {!needsConfirmation && toolInvocation.state === "result" && (
-                                      <span className="ml-2 text-xs text-[#F48120]/70">✓ Completed</span>
+                                      <span className="text-xs text-[#F48120]/70">✓ Completed</span>
                                     )}
                                   </h4>
                                 </div>
