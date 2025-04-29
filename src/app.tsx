@@ -11,6 +11,7 @@ import { Card } from "@/components/card/Card";
 import { Avatar } from "@/components/avatar/Avatar";
 import { Toggle } from "@/components/toggle/Toggle";
 import { Tooltip } from "@/components/tooltip/Tooltip";
+import { Textarea } from "@/components/textarea/Textarea";
 
 // Icon imports
 import {
@@ -362,7 +363,7 @@ export default function Chat() {
         >
           <div className="flex items-center gap-2">
             <div className="flex-1 relative">
-              <textarea
+              <Textarea
                 disabled={pendingToolCallConfirmation}
                 placeholder={
                   pendingToolCallConfirmation
