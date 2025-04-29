@@ -359,38 +359,41 @@ export default function Chat() {
         >
           <div className="flex items-center gap-2">
             <div className="flex-1 relative">
-              <Input
+              <textarea
                 disabled={pendingToolCallConfirmation}
                 placeholder={
                   pendingToolCallConfirmation
                     ? "Please respond to the tool confirmation above..."
                     : "Type your message..."
                 }
-                className="pl-4 pr-10 py-2 w-full rounded-full"
+                className="w-full border border-neutral-300 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900 px-4 py-2 rounded-2xl text-base min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none focus:outline-none focus:ring-2 focus:ring-[#F48120] focus:ring-opacity-50"
                 value={agentInput}
-                onChange={handleAgentInputChange}
+                onChange={(e) => {
+                  handleAgentInputChange(e);
+                  // Auto-resize the textarea
+                  e.target.style.height = 'auto';
+                  e.target.style.height = `${e.target.scrollHeight}px`;
+                }}
                 onKeyDown={(e) => {
-                  if (
-                    e.key === "Enter" &&
-                    !e.shiftKey &&
-                    !e.nativeEvent.isComposing
-                  ) {
+                  if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
                     e.preventDefault();
                     handleAgentSubmit(e as unknown as React.FormEvent);
                   }
                 }}
-                onValueChange={undefined}
+                rows={1}
+                style={{ height: 'auto' }}
               />
+              <div className="absolute bottom-2 right-2">
+                <Button
+                  type="submit"
+                  shape="square"
+                  className="rounded-full h-8 w-8 flex-shrink-0 bg-[#F48120] hover:bg-[#F48120]/90"
+                  disabled={pendingToolCallConfirmation || !agentInput.trim()}
+                >
+                  <PaperPlaneRight size={16} className="text-white" />
+                </Button>
+              </div>
             </div>
-
-            <Button
-              type="submit"
-              shape="square"
-              className="rounded-full h-10 w-10 flex-shrink-0"
-              disabled={pendingToolCallConfirmation || !agentInput.trim()}
-            >
-              <PaperPlaneRight size={16} />
-            </Button>
           </div>
         </form>
       </div>
