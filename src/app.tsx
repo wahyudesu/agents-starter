@@ -22,6 +22,7 @@ import {
   Robot,
   Sun,
   Trash,
+  CaretDown,
 } from "@phosphor-icons/react";
 
 // List of tools that require human confirmation
@@ -266,6 +267,7 @@ export default function Chat() {
                             const needsConfirmation = toolsRequiringConfirmation.includes(
                               toolInvocation.toolName as keyof typeof tools
                             );
+                            const [isExpanded, setIsExpanded] = useState(true);
 
                             // Skip rendering the card in debug mode
                             if (showDebug) return null;
@@ -276,73 +278,86 @@ export default function Chat() {
                                 key={i}
                                 className={`p-4 my-3 w-full max-w-[500px] rounded-md bg-neutral-100 dark:bg-neutral-900 ${
                                   needsConfirmation ? "" : "border-[#F48120]/30"
-                                } max-h-[200px] overflow-y-auto`}
+                                } overflow-hidden`}
                               >
-                                <div className="flex items-center gap-2 mb-3">
-                                  <div className={`${needsConfirmation ? "bg-[#F48120]/10" : "bg-[#F48120]/5"} p-1.5 rounded-full flex-shrink-0`}>
-                                    <Robot
-                                      size={16}
-                                      className="text-[#F48120]"
-                                    />
-                                  </div>
-                                  <h4 className="font-medium flex items-center gap-2">
-                                    {toolInvocation.toolName}
-                                    {!needsConfirmation && toolInvocation.state === "result" && (
-                                      <span className="text-xs text-[#F48120]/70">✓ Completed</span>
-                                    )}
-                                  </h4>
-                                </div>
-
-                                <div className="mb-3">
-                                  <h5 className="text-xs font-medium mb-1 text-muted-foreground">
-                                    Arguments:
-                                  </h5>
-                                  <pre className="bg-background/80 p-2 rounded-md text-xs overflow-auto whitespace-pre-wrap break-words max-w-[450px]">
-                                    {JSON.stringify(
-                                      toolInvocation.args,
-                                      null,
-                                      2
-                                    )}
-                                  </pre>
-                                </div>
-
-                                {needsConfirmation && toolInvocation.state === "call" && (
-                                  <div className="flex gap-2 justify-end">
-                                    <Button
-                                      variant="primary"
-                                      size="sm"
-                                      onClick={() =>
-                                        addToolResult({
-                                          toolCallId,
-                                          result: APPROVAL.NO,
-                                        })
-                                      }
-                                    >
-                                      Reject
-                                    </Button>
-                                    <Tooltip content={"Accept action"}>
-                                      <Button
-                                        variant="primary"
-                                        size="sm"
-                                        onClick={() =>
-                                          addToolResult({
-                                            toolCallId,
-                                            result: APPROVAL.YES,
-                                          })
-                                        }
+                                {(() => {
+                                  return (
+                                    <>
+                                      <button 
+                                        type="button"
+                                        onClick={() => setIsExpanded(!isExpanded)}
+                                        className="w-full flex items-center gap-2 cursor-pointer"
                                       >
-                                        Approve
-                                      </Button>
-                                    </Tooltip>
-                                  </div>
-                                )}
+                                        <div className={`${needsConfirmation ? "bg-[#F48120]/10" : "bg-[#F48120]/5"} p-1.5 rounded-full flex-shrink-0`}>
+                                          <Robot
+                                            size={16}
+                                            className="text-[#F48120]"
+                                          />
+                                        </div>
+                                        <h4 className="font-medium flex items-center gap-2 flex-1 text-left">
+                                          {toolInvocation.toolName}
+                                          {!needsConfirmation && toolInvocation.state === "result" && (
+                                            <span className="text-xs text-[#F48120]/70">✓ Completed</span>
+                                          )}
+                                        </h4>
+                                        <CaretDown 
+                                          size={16} 
+                                          className={`text-muted-foreground transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                                        />
+                                      </button>
 
-                                {!needsConfirmation && toolInvocation.state === "result" && (
-                                  <div className="mt-3 border-t border-[#F48120]/10 pt-3">
-                                    <h5 className="text-xs font-medium mb-1 text-muted-foreground">
-                                      Result:
-                                    </h5>
-                                    <pre className="bg-background/80 p-2 rounded-md text-xs overflow-auto whitespace-pre-wrap break-words max-w-[450px]">
+                                      <div className={`transition-all duration-200 ${isExpanded ? 'max-h-[200px] opacity-100 mt-3' : 'max-h-0 opacity-0 overflow-hidden'}`}>
+                                        <div className="overflow-y-auto" style={{ maxHeight: isExpanded ? '180px' : '0px' }}>
+                                          <div className="mb-3">
+                                            <h5 className="text-xs font-medium mb-1 text-muted-foreground">
+                                              Arguments:
+                                            </h5>
+                                            <pre className="bg-background/80 p-2 rounded-md text-xs overflow-auto whitespace-pre-wrap break-words max-w-[450px]">
+                                              {JSON.stringify(
+                                                toolInvocation.args,
+                                                null,
+                                                2
+                                              )}
+                                            </pre>
+                                          </div>
+
+                                          {needsConfirmation && toolInvocation.state === "call" && (
+                                            <div className="flex gap-2 justify-end">
+                                              <Button
+                                                variant="primary"
+                                                size="sm"
+                                                onClick={() =>
+                                                  addToolResult({
+                                                    toolCallId,
+                                                    result: APPROVAL.NO,
+                                                  })
+                                                }
+                                              >
+                                                Reject
+                                              </Button>
+                                              <Tooltip content={"Accept action"}>
+                                                <Button
+                                                  variant="primary"
+                                                  size="sm"
+                                                  onClick={() =>
+                                                    addToolResult({
+                                                      toolCallId,
+                                                      result: APPROVAL.YES,
+                                                    })
+                                                  }
+                                                >
+                                                  Approve
+                                                </Button>
+                                              </Tooltip>
+                                            </div>
+                                          )}
+
+                                          {!needsConfirmation && toolInvocation.state === "result" && (
+                                            <div className="mt-3 border-t border-[#F48120]/10 pt-3">
+                                              <h5 className="text-xs font-medium mb-1 text-muted-foreground">
+                                                Result:
+                                              </h5>
+                                              <pre className="bg-background/80 p-2 rounded-md text-xs overflow-auto whitespace-pre-wrap break-words max-w-[450px]">
 {(() => {
   const result = toolInvocation.result;
   if (typeof result === 'object' && result.content) {
@@ -358,8 +373,13 @@ export default function Chat() {
   }
   return JSON.stringify(result, null, 2);
 })()}</pre>
-                                  </div>
-                                )}
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </>
+                                  );
+                                })()}
                               </Card>
                             );
                           }
