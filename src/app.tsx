@@ -267,6 +267,9 @@ export default function Chat() {
                               toolInvocation.toolName as keyof typeof tools
                             );
 
+                            // Skip rendering the card in debug mode
+                            if (showDebug) return null;
+
                             return (
                               <Card
                                 // biome-ignore lint/suspicious/noArrayIndexKey: it's fine here
