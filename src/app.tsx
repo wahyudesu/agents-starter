@@ -263,44 +263,47 @@ export default function Chat() {
                           if (part.type === "tool-invocation") {
                             const toolInvocation = part.toolInvocation;
                             const toolCallId = toolInvocation.toolCallId;
+                            const needsConfirmation = toolsRequiringConfirmation.includes(
+                              toolInvocation.toolName as keyof typeof tools
+                            );
 
-                            if (
-                              toolsRequiringConfirmation.includes(
-                                toolInvocation.toolName as keyof typeof tools
-                              ) &&
-                              toolInvocation.state === "call"
-                            ) {
-                              return (
-                                <Card
-                                  // biome-ignore lint/suspicious/noArrayIndexKey: it's fine here
-                                  key={i}
-                                  className="p-4 my-3 rounded-md bg-neutral-100 dark:bg-neutral-900"
-                                >
-                                  <div className="flex items-center gap-2 mb-3">
-                                    <div className="bg-[#F48120]/10 p-1.5 rounded-full">
-                                      <Robot
-                                        size={16}
-                                        className="text-[#F48120]"
-                                      />
-                                    </div>
-                                    <h4 className="font-medium">
-                                      {toolInvocation.toolName}
-                                    </h4>
+                            return (
+                              <Card
+                                // biome-ignore lint/suspicious/noArrayIndexKey: it's fine here
+                                key={i}
+                                className={`p-4 my-3 rounded-md bg-neutral-100 dark:bg-neutral-900 ${
+                                  needsConfirmation ? "" : "border-[#F48120]/30"
+                                }`}
+                              >
+                                <div className="flex items-center gap-2 mb-3">
+                                  <div className={`${needsConfirmation ? "bg-[#F48120]/10" : "bg-[#F48120]/5"} p-1.5 rounded-full`}>
+                                    <Robot
+                                      size={16}
+                                      className="text-[#F48120]"
+                                    />
                                   </div>
+                                  <h4 className="font-medium">
+                                    {toolInvocation.toolName}
+                                    {!needsConfirmation && toolInvocation.state === "result" && (
+                                      <span className="ml-2 text-xs text-[#F48120]/70">✓ Completed</span>
+                                    )}
+                                  </h4>
+                                </div>
 
-                                  <div className="mb-3">
-                                    <h5 className="text-xs font-medium mb-1 text-muted-foreground">
-                                      Arguments:
-                                    </h5>
-                                    <pre className="bg-background/80 p-2 rounded-md text-xs overflow-auto">
-                                      {JSON.stringify(
-                                        toolInvocation.args,
-                                        null,
-                                        2
-                                      )}
-                                    </pre>
-                                  </div>
+                                <div className="mb-3">
+                                  <h5 className="text-xs font-medium mb-1 text-muted-foreground">
+                                    Arguments:
+                                  </h5>
+                                  <pre className="bg-background/80 p-2 rounded-md text-xs overflow-auto">
+                                    {JSON.stringify(
+                                      toolInvocation.args,
+                                      null,
+                                      2
+                                    )}
+                                  </pre>
+                                </div>
 
+                                {needsConfirmation && toolInvocation.state === "call" && (
                                   <div className="flex gap-2 justify-end">
                                     <Button
                                       variant="primary"
@@ -329,10 +332,24 @@ export default function Chat() {
                                       </Button>
                                     </Tooltip>
                                   </div>
-                                </Card>
-                              );
-                            }
-                            return null;
+                                )}
+
+                                {!needsConfirmation && toolInvocation.state === "result" && (
+                                  <div className="mt-3 border-t border-[#F48120]/10 pt-3">
+                                    <h5 className="text-xs font-medium mb-1 text-muted-foreground">
+                                      Result:
+                                    </h5>
+                                    <pre className="bg-background/80 p-2 rounded-md text-xs overflow-auto">
+                                      {JSON.stringify(
+                                        toolInvocation.result,
+                                        null,
+                                        2
+                                      )}
+                                    </pre>
+                                  </div>
+                                )}
+                              </Card>
+                            );
                           }
                           return null;
                         })}
