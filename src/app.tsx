@@ -20,7 +20,6 @@ import {
   Robot,
   Sun,
   Trash,
-  PaperclipHorizontal,
   PaperPlaneTilt,
 } from "@phosphor-icons/react";
 
@@ -342,28 +341,6 @@ export default function Chat() {
                 rows={2}
                 style={{ height: textareaHeight }}
               />
-              <input
-                type="file"
-                className="fixed -top-4 -left-4 size-0.5 opacity-0 pointer-events-none"
-                multiple
-                tabIndex={-1}
-              />
-              <div className="absolute bottom-0 p-2 w-fit flex flex-row justify-start">
-                <button
-                  type="button"
-                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:text-accent-foreground rounded-md rounded-bl-lg p-[7px] h-fit dark:border-zinc-700 hover:dark:bg-zinc-900 hover:bg-zinc-200"
-                  onClick={() => {
-                    const fileInput = document.querySelector(
-                      'input[type="file"]'
-                    ) as HTMLInputElement;
-                    fileInput?.click();
-                  }}
-                  disabled={true}
-                  title="Attachments coming soon!"
-                >
-                  <PaperclipHorizontal size={16} className="-rotate-45" />
-                </button>
-              </div>
               <div className="absolute bottom-0 right-0 p-2 w-fit flex flex-row justify-end">
                 <button
                   type="submit"
