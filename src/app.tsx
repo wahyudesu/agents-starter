@@ -9,9 +9,8 @@ import { Button } from "@/components/button/Button";
 import { Card } from "@/components/card/Card";
 import { Avatar } from "@/components/avatar/Avatar";
 import { Toggle } from "@/components/toggle/Toggle";
-import { Tooltip } from "@/components/tooltip/Tooltip";
 import { Textarea } from "@/components/textarea/Textarea";
-import { MemoizedMarkdown } from "./components/memoized-markdown";
+import { MemoizedMarkdown } from "@/components/memoized-markdown";
 import { ToolInvocationCard } from "@/components/tool-invocation-card/ToolInvocationCard";
 
 // Icon imports
