@@ -2,7 +2,6 @@ import { useEffect, useState, useRef, useCallback, use } from "react";
 import { useAgent } from "agents/react";
 import { useAgentChat } from "agents/ai-react";
 import type { Message } from "@ai-sdk/react";
-import { APPROVAL } from "./shared";
 import type { tools } from "./tools";
 
 // Component imports
@@ -12,6 +11,8 @@ import { Avatar } from "@/components/avatar/Avatar";
 import { Toggle } from "@/components/toggle/Toggle";
 import { Tooltip } from "@/components/tooltip/Tooltip";
 import { Textarea } from "@/components/textarea/Textarea";
+import { MemoizedMarkdown } from "./components/memoized-markdown";
+import { ToolInvocationCard } from "@/components/tool-invocation-card/ToolInvocationCard";
 
 // Icon imports
 import {
@@ -220,7 +221,7 @@ export default function Chat() {
                         {m.parts?.map((part, i) => {
                           if (part.type === "text") {
                             return (
-                              // biome-ignore lint/suspicious/noArrayIndexKey: it's fine here
+                              // biome-ignore lint/suspicious/noArrayIndexKey: immutable index
                               <div key={i}>
                                 <Card
                                   className={`p-3 rounded-md bg-neutral-100 dark:bg-neutral-900 ${
@@ -240,12 +241,13 @@ export default function Chat() {
                                       🕒
                                     </span>
                                   )}
-                                  <p className="text-sm whitespace-pre-wrap">
-                                    {part.text.replace(
+                                  <MemoizedMarkdown
+                                    id={`${m.id}-${i}`}
+                                    content={part.text.replace(
                                       /^scheduled message: /,
                                       ""
                                     )}
-                                  </p>
+                                  />
                                 </Card>
                                 <p
                                   className={`text-xs text-muted-foreground mt-1 ${
@@ -263,76 +265,24 @@ export default function Chat() {
                           if (part.type === "tool-invocation") {
                             const toolInvocation = part.toolInvocation;
                             const toolCallId = toolInvocation.toolCallId;
-
-                            if (
+                            const needsConfirmation =
                               toolsRequiringConfirmation.includes(
                                 toolInvocation.toolName as keyof typeof tools
-                              ) &&
-                              toolInvocation.state === "call"
-                            ) {
-                              return (
-                                <Card
-                                  // biome-ignore lint/suspicious/noArrayIndexKey: it's fine here
-                                  key={i}
-                                  className="p-4 my-3 rounded-md bg-neutral-100 dark:bg-neutral-900"
-                                >
-                                  <div className="flex items-center gap-2 mb-3">
-                                    <div className="bg-[#F48120]/10 p-1.5 rounded-full">
-                                      <Robot
-                                        size={16}
-                                        className="text-[#F48120]"
-                                      />
-                                    </div>
-                                    <h4 className="font-medium">
-                                      {toolInvocation.toolName}
-                                    </h4>
-                                  </div>
-
-                                  <div className="mb-3">
-                                    <h5 className="text-xs font-medium mb-1 text-muted-foreground">
-                                      Arguments:
-                                    </h5>
-                                    <pre className="bg-background/80 p-2 rounded-md text-xs overflow-auto">
-                                      {JSON.stringify(
-                                        toolInvocation.args,
-                                        null,
-                                        2
-                                      )}
-                                    </pre>
-                                  </div>
-
-                                  <div className="flex gap-2 justify-end">
-                                    <Button
-                                      variant="primary"
-                                      size="sm"
-                                      onClick={() =>
-                                        addToolResult({
-                                          toolCallId,
-                                          result: APPROVAL.NO,
-                                        })
-                                      }
-                                    >
-                                      Reject
-                                    </Button>
-                                    <Tooltip content={"Accept action"}>
-                                      <Button
-                                        variant="primary"
-                                        size="sm"
-                                        onClick={() =>
-                                          addToolResult({
-                                            toolCallId,
-                                            result: APPROVAL.YES,
-                                          })
-                                        }
-                                      >
-                                        Approve
-                                      </Button>
-                                    </Tooltip>
-                                  </div>
-                                </Card>
                               );
-                            }
-                            return null;
+
+                            // Skip rendering the card in debug mode
+                            if (showDebug) return null;
+
+                            return (
+                              <ToolInvocationCard
+                                // biome-ignore lint/suspicious/noArrayIndexKey: using index is safe here as the array is static
+                                key={`${toolCallId}-${i}`}
+                                toolInvocation={toolInvocation}
+                                toolCallId={toolCallId}
+                                needsConfirmation={needsConfirmation}
+                                addToolResult={addToolResult}
+                              />
+                            );
                           }
                           return null;
                         })}
