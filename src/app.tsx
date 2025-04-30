@@ -36,7 +36,7 @@ export default function Chat() {
     return (savedTheme as "dark" | "light") || "dark";
   });
   const [showDebug, setShowDebug] = useState(false);
-  const [textareaHeight, setTextareaHeight] = useState('auto');
+  const [textareaHeight, setTextareaHeight] = useState("auto");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = useCallback(() => {
@@ -357,7 +357,7 @@ export default function Chat() {
                 },
               },
             });
-            setTextareaHeight('auto'); // Reset height after submission
+            setTextareaHeight("auto"); // Reset height after submission
           }}
           className="p-3 bg-gray-50 absolute bottom-0 left-0 right-0 z-10 border-t border-neutral-300 dark:border-neutral-800 dark:bg-neutral-900"
         >
@@ -375,32 +375,38 @@ export default function Chat() {
                 onChange={(e) => {
                   handleAgentInputChange(e);
                   // Auto-resize the textarea
-                  e.target.style.height = 'auto';
+                  e.target.style.height = "auto";
                   e.target.style.height = `${e.target.scrollHeight}px`;
                   setTextareaHeight(`${e.target.scrollHeight}px`);
                 }}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+                  if (
+                    e.key === "Enter" &&
+                    !e.shiftKey &&
+                    !e.nativeEvent.isComposing
+                  ) {
                     e.preventDefault();
                     handleAgentSubmit(e as unknown as React.FormEvent);
-                    setTextareaHeight('auto'); // Reset height on Enter submission
+                    setTextareaHeight("auto"); // Reset height on Enter submission
                   }
                 }}
                 rows={2}
                 style={{ height: textareaHeight }}
               />
-              <input 
-                type="file" 
-                className="fixed -top-4 -left-4 size-0.5 opacity-0 pointer-events-none" 
-                multiple 
+              <input
+                type="file"
+                className="fixed -top-4 -left-4 size-0.5 opacity-0 pointer-events-none"
+                multiple
                 tabIndex={-1}
               />
               <div className="absolute bottom-0 p-2 w-fit flex flex-row justify-start">
-                <button 
+                <button
                   type="button"
                   className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:text-accent-foreground rounded-md rounded-bl-lg p-[7px] h-fit dark:border-zinc-700 hover:dark:bg-zinc-900 hover:bg-zinc-200"
                   onClick={() => {
-                    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+                    const fileInput = document.querySelector(
+                      'input[type="file"]'
+                    ) as HTMLInputElement;
                     fileInput?.click();
                   }}
                   disabled={true}
@@ -410,7 +416,7 @@ export default function Chat() {
                 </button>
               </div>
               <div className="absolute bottom-0 right-0 p-2 w-fit flex flex-row justify-end">
-                <button 
+                <button
                   type="submit"
                   className="inline-flex items-center cursor-pointer justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full p-1.5 h-fit border dark:border-zinc-600"
                   disabled={pendingToolCallConfirmation || !agentInput.trim()}
