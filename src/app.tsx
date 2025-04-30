@@ -10,7 +10,6 @@ import { Card } from "@/components/card/Card";
 import { Input } from "@/components/input/Input";
 import { Avatar } from "@/components/avatar/Avatar";
 import { Toggle } from "@/components/toggle/Toggle";
-import { Tooltip } from "@/components/tooltip/Tooltip";
 import { MemoizedMarkdown } from "./components/memoized-markdown";
 import { ToolInvocationCard } from "@/components/tool-invocation-card/ToolInvocationCard";
 
