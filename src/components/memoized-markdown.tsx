@@ -1,8 +1,8 @@
-import { marked } from 'marked';
-import type { Tokens } from 'marked';
-import { memo, useMemo } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import { marked } from "marked";
+import type { Tokens } from "marked";
+import { memo, useMemo } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 function parseMarkdownIntoBlocks(markdown: string): string[] {
   const tokens: TokensList = marked.lexer(markdown);
@@ -20,15 +20,16 @@ const MemoizedMarkdownBlock = memo(
   (prevProps, nextProps) => prevProps.content === nextProps.content
 );
 
-MemoizedMarkdownBlock.displayName = 'MemoizedMarkdownBlock';
+MemoizedMarkdownBlock.displayName = "MemoizedMarkdownBlock";
 
 export const MemoizedMarkdown = memo(
   ({ content, id }: { content: string; id: string }) => {
     const blocks = useMemo(() => parseMarkdownIntoBlocks(content), [content]);
     return blocks.map((block, index) => (
+      // biome-ignore lint/suspicious/noArrayIndexKey: immutable index
       <MemoizedMarkdownBlock content={block} key={`${id}-block_${index}`} />
     ));
   }
 );
 
-MemoizedMarkdown.displayName = 'MemoizedMarkdown'; 
+MemoizedMarkdown.displayName = "MemoizedMarkdown";
