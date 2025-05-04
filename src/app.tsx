@@ -7,20 +7,20 @@ import type { tools } from "./tools";
 // Component imports
 import { Button } from "@/components/button/Button";
 import { Card } from "@/components/card/Card";
-import { Input } from "@/components/input/Input";
 import { Avatar } from "@/components/avatar/Avatar";
 import { Toggle } from "@/components/toggle/Toggle";
-import { MemoizedMarkdown } from "./components/memoized-markdown";
+import { Textarea } from "@/components/textarea/Textarea";
+import { MemoizedMarkdown } from "@/components/memoized-markdown";
 import { ToolInvocationCard } from "@/components/tool-invocation-card/ToolInvocationCard";
 
 // Icon imports
 import {
   Bug,
   Moon,
-  PaperPlaneRight,
   Robot,
   Sun,
   Trash,
+  PaperPlaneTilt,
 } from "@phosphor-icons/react";
 
 // List of tools that require human confirmation
@@ -35,6 +35,7 @@ export default function Chat() {
     return (savedTheme as "dark" | "light") || "dark";
   });
   const [showDebug, setShowDebug] = useState(false);
+  const [textareaHeight, setTextareaHeight] = useState("auto");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = useCallback(() => {
@@ -295,29 +296,37 @@ export default function Chat() {
 
         {/* Input Area */}
         <form
-          onSubmit={(e) =>
+          onSubmit={(e) => {
+            e.preventDefault();
             handleAgentSubmit(e, {
               data: {
                 annotations: {
                   hello: "world",
                 },
               },
-            })
-          }
-          className="p-3 bg-input-background absolute bottom-0 left-0 right-0 z-10 border-t border-neutral-300 dark:border-neutral-800"
+            });
+            setTextareaHeight("auto"); // Reset height after submission
+          }}
+          className="p-3 bg-neutral-50 absolute bottom-0 left-0 right-0 z-10 border-t border-neutral-300 dark:border-neutral-800 dark:bg-neutral-900"
         >
           <div className="flex items-center gap-2">
             <div className="flex-1 relative">
-              <Input
+              <Textarea
                 disabled={pendingToolCallConfirmation}
                 placeholder={
                   pendingToolCallConfirmation
                     ? "Please respond to the tool confirmation above..."
-                    : "Type your message..."
+                    : "Send a message..."
                 }
-                className="pl-4 pr-10 py-2 w-full rounded-full"
+                className="flex w-full border border-neutral-200 dark:border-neutral-700 px-3 py-2 text-base ring-offset-background placeholder:text-neutral-500 dark:placeholder:text-neutral-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-300 dark:focus-visible:ring-neutral-700 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-neutral-900 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-2xl !text-base pb-10 dark:bg-neutral-900"
                 value={agentInput}
-                onChange={handleAgentInputChange}
+                onChange={(e) => {
+                  handleAgentInputChange(e);
+                  // Auto-resize the textarea
+                  e.target.style.height = "auto";
+                  e.target.style.height = `${e.target.scrollHeight}px`;
+                  setTextareaHeight(`${e.target.scrollHeight}px`);
+                }}
                 onKeyDown={(e) => {
                   if (
                     e.key === "Enter" &&
@@ -326,20 +335,22 @@ export default function Chat() {
                   ) {
                     e.preventDefault();
                     handleAgentSubmit(e as unknown as React.FormEvent);
+                    setTextareaHeight("auto"); // Reset height on Enter submission
                   }
                 }}
-                onValueChange={undefined}
+                rows={2}
+                style={{ height: textareaHeight }}
               />
+              <div className="absolute bottom-0 right-0 p-2 w-fit flex flex-row justify-end">
+                <button
+                  type="submit"
+                  className="inline-flex items-center cursor-pointer justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full p-1.5 h-fit border border-neutral-200 dark:border-neutral-800"
+                  disabled={pendingToolCallConfirmation || !agentInput.trim()}
+                >
+                  <PaperPlaneTilt size={16} />
+                </button>
+              </div>
             </div>
-
-            <Button
-              type="submit"
-              shape="square"
-              className="rounded-full h-10 w-10 flex-shrink-0"
-              disabled={pendingToolCallConfirmation || !agentInput.trim()}
-            >
-              <PaperPlaneRight size={16} />
-            </Button>
           </div>
         </form>
       </div>
