@@ -33,7 +33,7 @@ export class Chat extends AIChatAgent<Env> {
 
   async onChatMessage(
     onFinish: StreamTextOnFinishCallback<ToolSet>,
-    options?: { abortSignal?: AbortSignal }
+    _options?: { abortSignal?: AbortSignal }
   ) {
     // const mcpConnection = await this.mcp.connect(
     //   "https://path-to-mcp-server/sse"
@@ -87,7 +87,7 @@ If the user asks to schedule a task, use the schedule tool to schedule the task.
 
     return dataStreamResponse;
   }
-  async executeTask(description: string, task: Schedule<string>) {
+  async executeTask(description: string, _task: Schedule<string>) {
     await this.saveMessages([
       ...this.messages,
       {
@@ -104,7 +104,7 @@ If the user asks to schedule a task, use the schedule tool to schedule the task.
  * Worker entry point that routes incoming requests to the appropriate handler
  */
 export default {
-  async fetch(request: Request, env: Env, ctx: ExecutionContext) {
+  async fetch(request: Request, env: Env, _ctx: ExecutionContext) {
     const url = new URL(request.url);
 
     if (url.pathname === "/check-open-ai-key") {
